@@ -1,0 +1,71 @@
+<%- include('../includes/head')%>
+
+</head>
+<body>
+    <!-- navigation -->
+    <%- include('../includes/admin-navigation')%>
+    
+
+    <div class="row mx-0">
+        <!-- sidebar  -->
+        <%- include('../includes/admin-sidebar')%>
+        <!-- shop items -->
+        <div class="px-1 col-10">
+            <!-- table of comments -->
+            <div class="table table-responsive-md">
+                <table class="table text-center">
+                    <thead>
+                        <tr>
+                            <th scope="col">#</th>
+                            <th scope="col">فرستنده</th>
+                            <th scope="col">تاریخ</th>
+                            <th scope="col">محصول</th>
+                            <th scope="col">متن</th>
+                            <th scope="col">ادیت</th>
+                            <th scope="col">تغییر وضعیت</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <% for(let comment of comments) { %>
+                            <!-- product detail -->
+                            <tr class="small">
+                                <th><%= comment.id %></th>
+                                <td><%= comment.email %></td>
+                                <td class="small"><%= comment.createdAt.toLocaleString() %></td>
+                                <td><%= comment.product.title %></td>
+                                <td><%= comment.content %></td>
+                                <td class="d-flex justify-content-center">
+                                    <form action="/admin/comments/delete" method="POST">
+                                        <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+                                        <input type="hidden" name="commentId" value="<%= comment.id  %>">
+                                        <button class="mx-1 btn-sm btn-info" type="submit">
+                                            حذف
+                                        </button>
+                                    </form>
+                                </td>
+                                <td>
+                                    <form action="/admin/comment/status" method="POST">
+                                        <select class="small p-0 m-0" name="commentStatusId" id="commentStatusId">
+                                            <% if(comment.commentStatusId === 2) { %>
+                                                <option value="2">منتشرشده</option>
+                                                <option value="1">درحال بررسی</option>
+                                            <% } else { %>
+                                                    <option value="1">درحال بررسی</option>
+                                                    <option value="2">منتشرشده</option>
+                                            <% }%>     
+                                        </select>
+                                        <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+                                        <input type="hidden" name="commentId" value="<%= comment.id  %>">
+                                        <button type="submit" class="m-0 p-0 small btn btn-sm btn-info">تایید</button>
+                                    </form>
+                                </td>
+    
+                            </tr>
+                        <% } %>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <%- include('../includes/end')%>

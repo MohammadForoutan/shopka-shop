@@ -1,0 +1,109 @@
+<%- include('../includes/head')%>
+</head>
+<body>
+    <!-- navigation -->
+    <%- include('../includes/admin-navigation')%>
+    <%- include('../includes/navigation')%>
+    <%- include('../includes/menu')%>
+
+    <div class="container">
+        <div class="row p-5">
+            <div class="col-6">
+                <img class="w-50"  src="http://localhost:3000/<%= product.image %>" alt="<%= product.title %>">
+                <% if(user.accessLevelId == ADMIN_ACCESS_LEVEL) { %>
+                    <a href="/admin/product/edit?id=<%=product.id%>" class="btn btn-info">ویرایش محصول</a>
+                <% } %>
+            </div>
+            <div class="col-6">
+                <!-- SINGLE PRODUCT -->
+                <h2><%= product.title %></h2>
+
+                <br>
+                <h4>توضیحات</h4>
+                <p>
+                    <%= product.description %>
+                </p>
+
+                <p class="text-info btn btn-light">
+                    <%= product.price  %> <b>تومان</b>
+                </p>
+                
+                <!-- ADD TO CART -->
+                <div class="mt-auto">
+                    <%- include('../includes/add-to-cart', {product})%>
+                </div>
+            </div>
+        </div>
+        <br>
+
+        <!-- tab for things -->
+        <nav>
+            <div class="nav nav-tabs" id="nav-tab" role="tablist">
+              <button class="nav-link active" id="nav-attributes-tab" data-bs-toggle="tab" data-bs-target="#nav-attributes" type="button" role="tab" aria-controls="nav-attributes" aria-selected="true">ویژگی ها</button>
+              <button class="nav-link" id="nav-comment-tab" data-bs-toggle="tab" data-bs-target="#nav-comment" type="button" role="tab" aria-controls="nav-comment" aria-selected="false">نظرات</button>
+              <button class="nav-link" id="nav-complete-description-tab" data-bs-toggle="tab" data-bs-target="#nav-complete-description" type="button" role="tab" aria-controls="nav-complete-description" aria-selected="false">توضیحات تکمیلی</button>
+            </div>
+        </nav>
+        <div class="tab-content" id="nav-tabContent">
+            <div class="tab-pane fade show active w-75" id="nav-attributes" role="tabpanel" aria-labelledby="nav-attributes-tab">
+                <%- product.attributes %>
+            </div>
+            <div class="tab-pane fade text-right" id="nav-comment" role="tabpanel" aria-labelledby="nav-comment-tab">
+                <h4 class="text-right pt-4 py-2">دیدگاه‌ها</h4>
+                <!-- if user logged in or not -->
+                <% if(!isLoggedIn) {%>
+                    <a href="/auth/login" class="btn-warning shadow">
+                        لطفا ابتدا وارد حساب خود شوید
+                    </a>
+                    <% } else { %>
+                        <form action="<% if(commentEditMode){ %>/comment/<%= comment.id %>  <% } else {%>/comment <%}%>" method="POST">
+                            <label id="#comment" class="d-block text-right" for="content">دیدگاه‌ شما:</label>
+                            
+                            <label class="d-block" for="content">نظر شما</label>
+                            <textarea class="text-right w-75" name="content" id="content" rows="10" placeholder="نظرشما"><%= comment ? comment.content : '' %></textarea>
+        
+                            <input type="hidden" name="productId" value="<%= product.id %>">
+        
+                            <!-- csrf TOKEN -->
+                            <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+                            <br>
+                            <input type="submit" value="ارسال">
+                        </form>
+                    <%} %>
+
+                <!-- COMMENTS -->
+                <div>
+                    <% for(let comment of comments) { %>
+                        <div style="width: 300px;" class="p-2 m-3 rounded border border-4">
+                            <div class="d-flex align-items-center">
+                                <img class="me-2 rounded-pill" style="width: 3rem;" src="<%= staticImage %><%= comment.user.avatar %>" alt="<%= comment.user.name %>">
+                                <p><%= comment.user.name || comment.email %></p>
+                            </div>
+                            <hr>
+                            <p>
+                                <%= comment.content%>
+                            </p>
+                            <% if(comment.user.id == user.id) { %>
+                                <form action="/comment/edit" method="POST">
+                                    <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+                                    <input type="hidden" name="commentId" value="<%= comment.id  %>">
+                                    <input type="hidden" name="productId" value="<%= product.id  %>">
+                                    <button type="submit" class="m-0 p-0 small btn btn-sm btn-info">ویرایش</button>
+                                </form>
+                            <% } %>
+                        </div>
+                    <% } %>
+                </div>
+            </div>
+            <div class="tab-pane fade" id="nav-complete-description" role="tabpanel" aria-labelledby="nav-complete-description-tab">
+                complete description
+            </div>
+        </div>
+
+        <br>
+        <br>
+    </div>
+    <script src="/js/ckeditor.js"></script>
+
+    <!-- END -->
+    <%- include('../includes/end')%>

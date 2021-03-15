@@ -1,0 +1,129 @@
+<%- include('../includes/head')%>
+    </head>
+
+    <body>
+        <!-- navigation -->
+        <%- include('../includes/admin-navigation')%>
+
+
+            <div class="row mx-0">
+                <!-- sidebar  -->
+                <%- include('../includes/admin-sidebar')%>
+
+                    <!-- add product  -->
+                    <div class="px-5 col-10">
+                        <!-- Flash errors and messages -->
+                        <!-- delete duplicate sentenses -->
+                        <% 
+                        let unique_errorMessages = [...new Set(errorMessages)]
+                        %>
+                        <% if(unique_errorMessages.length > 0) { %>
+                            <% for(let message of unique_errorMessages) { %>
+                                <div class="alert alert-danger alert-dismissible fade show" role="alert"> 
+                                        <%= message %>
+                                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                                </div>
+                            <% } %>
+                        <% } %>
+
+                        <!-- title -->
+                        <div class="alert alert-primary text-center mt-3" role="alert">
+                            <h3 style="font-weight: 700;" class="mb-0 py-1">کاربران</h3>
+                        </div>
+
+                        <!-- EDITMODE -->
+                        <% if(editMode) {%>
+                            <div class="row flex-row">
+								<!-- column ONE -->
+								<div class="col-6">
+                                    <form action="/admin/accesses" method="POST">
+                                        
+                                            <!-- user name-->
+                                            <div>
+                                                <label for="name">نام کاربر</label>
+                                                <input type="text" id="name" name="name" value="<%= user.name %>">
+                                            </div>
+        
+                                            <br>
+        
+                                            <!-- user email -->
+                                            <div>
+                                                <label for="email">ایمیل</label>
+                                                <input type="text" id="email" name="email" value="<%= user.email %>" />
+                                            </div>
+        
+                                            <br>
+        
+                                        </div>
+                                        <!-- column TWO -->
+                                        <div class="col">
+                                            <!-- user accessLevel -->
+                                            <div>
+                                                <label for="accessLevel">درجه کاربر</label>
+                                                <input type="text" id="accessLevel" name="accessLevel" value="<%= user.accessLevel ?  user.accessLevel.name : '' %>">
+                                            </div>
+        
+                                            <br>
+                                            <!-- user accessLevelId -->
+                                            <div>
+                                                <label for="accessLevelId">درجه کاربر (عددی)</label>
+                                                <input type="number" id="accessLevelId" name="accessLevelId"  value="<%= user.accessLevel ? user.accessLevel.id : '' %>">
+                                            </div>
+        
+                                            <br>
+                                                
+                                            </div>
+                                        </div>
+                                    
+                                        <!-- user id for access -->
+                                        <input type="hidden" name="userId" value="<%= user.id %>">
+
+                                       
+                                        <!-- csrfToken -->
+                                        <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+
+                                        <button class='btn btn-primary' type="submit">ثبت اطلاعات</button>
+                                        <br>
+                                        <br>
+                                    </form>
+                        <% } %>
+
+                        <table class="table text-center">
+                            
+                            <thead>
+                                <tr>
+                                    <th scope="col">#</th>
+                                    <th scope="col">نام</th>
+                                    <th scope="col">سطح دسترسی</th>
+                                    <th scope="col">درجه دسترسی</th>
+                                    <th scope="col">ویرایش</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <% for(let user of users) { %>
+                                    <!-- product detail -->
+                                    <tr>
+                                        <th>
+                                            <%= user.id %>
+                                        </th>
+                                        <td>
+                                            <%= user.name %>
+                                        </td>
+                                        <td>
+                                            <%= user.accessLevel ? user.accessLevel.name : 'تنظیم نشده'%>
+                                        </td>
+                                        <td>
+                                            <%= user.accessLevel ? user.accessLevel.id : 'تنظیم نشده' %>
+                                        </td>
+                                        <td>
+                                            <a href="/admin/accesses/edit?id=<%= user.id %>" class="btn btn-warning p-1 py-0  btn-sm">ویرایش</a>
+                                        </td>
+                                    </tr>
+                                    <% } %>
+                            </tbody>
+                        </table>
+
+                    </div>
+            </div>
+
+            <%- include('../includes/end')%>

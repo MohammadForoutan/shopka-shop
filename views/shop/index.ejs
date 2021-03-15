@@ -1,0 +1,42 @@
+<%- include('../includes/head')%>
+<link rel="stylesheet" href="/css/sidebar.css">
+
+</head>
+<body>
+     <!-- Flash errors and messages -->
+    <!-- delete duplicate sentenses -->
+    <% 
+        let unique_errorMessages = [...new Set(errorMessages)]
+    %>
+    <% if(unique_errorMessages.length > 0) { %>
+        <% for(let message of unique_errorMessages) { %>
+            <div class="alert alert-danger alert-dismissible fade show" role="alert"> 
+                    <%= message %>
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        <% } %>
+    <% } %>
+    <%- include('../includes/admin-navigation')%>
+    <%- include('../includes/navigation')%>
+    <%- include('../includes/menu')%>
+    <div class="row mx-0">
+        <div class="col-4">
+            <img src="#" alt="poster">
+            <img src="#" alt="poster">
+        </div>
+        <div class="col-8">
+            <%- include('../includes/carousel')%>
+        </div>
+        
+        <!-- shop -->
+        <div class="row">
+            <div class="col-4">
+                <%- include('../includes/sidebar')%>
+            </div>
+            <div class="col-8">shop items</div>
+        </div>
+    </div>
+
+
+
+    <%- include('../includes/end')%>

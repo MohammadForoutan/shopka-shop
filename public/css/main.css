@@ -1,0 +1,26 @@
+body {
+    font-family: Vazir, Rajdhani;
+    text-align: right;
+    direction: rtl;
+}
+
+*,
+a,
+p,
+li,
+input,
+textarea {
+    box-sizing: border-box;
+    direction: inherit;
+    text-align: inherit !important;
+}
+
+.close {
+    outline: none !important;;
+}
+
+.invalid {
+    box-shadow: 0 0 10px 3px rgba(255, 30, 0, 0.85);
+    transition: 1s;
+}
+

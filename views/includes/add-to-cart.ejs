@@ -1,0 +1,6 @@
+<form class="btn btn-sm" action="/cart" method="POST">
+    <input type="hidden" name="productId" value="<%= product.id %>">
+    <!-- csrfToken -->
+    <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+    <button  class="btn btn-primary btn-sm"type="submit">اضافه کردن به سبد</button>
+</form>

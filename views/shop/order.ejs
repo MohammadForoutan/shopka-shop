@@ -1,0 +1,52 @@
+<%- include('../includes/head')%>
+
+</head>
+<body>
+    <!-- navigation -->
+    <%- include('../includes/admin-navigation')%>
+    <%- include('../includes/navigation')%>
+    <%- include('../includes/menu')%>
+    
+    <div class="alert alert-primary text-center" role="alert">
+       <h3 style="font-weight: 700;" class="mb-0 py-3">سفارش</h3>
+    </div>
+
+    <!-- Flash errors and messages -->
+        <!-- delete duplicate sentenses -->
+        <% 
+            let unique_errorMessages = [...new Set(errorMessages)]
+        %>
+        <% if(unique_errorMessages.length > 0) { %>
+            <% for(let message of unique_errorMessages) { %>
+                <div class="alert alert-danger alert-dismissible fade show" role="alert"> 
+                        <%= message %>
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            <% } %>
+        <% } %>
+
+    <!-- Order - ITEMS  -->
+    
+    <ul class="p-0 mx-3">
+        <% if (orders.length > 0) {%>
+            <% for(let order of orders) { %>
+                <li class="list-unstyled border rounded mb-2 bg-light p-2">
+                    <span class="badge bg-info text-dark"><%= order.id%></span>
+                    <a href="/order/<%= order.id %>">رسید</a>
+                    <ul>
+                        <% for(let product of order.products) { %>
+                            <li><%= product.title %> (<%= product.orderItem.quantity %>)</li>
+                        <% } %>
+                    </ul>
+                </li>
+            <% } %>
+        <% } else { %>
+            <div style='width: 500px;' class="container alert alert-danger text-center" role="alert">
+                <h4 style="font-weight: 400;" class="mb-0 py-1">تابه حال سفارشی نداشته اید</h4>
+            </div>
+        <% } %>
+    </ul>
+
+
+    <!-- END -->
+    <%- include('../includes/end')%>

@@ -1,0 +1,107 @@
+<%- include('../includes/head')%>
+
+</head>
+<body>
+    <!-- navigation -->
+    <%- include('../includes/admin-navigation')%>
+    <%- include('../includes/navigation')%>
+    <%- include('../includes/menu')%>
+    
+    <div class="container row p-5">
+        <% if(!editMode) { %>
+            
+            <div class="col-4">
+                <figure class="figure">
+                    <img src="<%= staticImage %><%= user.avatar %>" class="figure-img img-fluid rounded w-100" alt="<%= user.name %>">
+                    <!-- form avatar -->
+                    <form action="/profile/avatar" method="POST" enctype="multipart/form-data">
+                        <input type="hidden" name="userId" value="<%= user.id %>">
+                        <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+                        <input class="w-75 small" type="file" name="image" id="image" />
+                        <button class="p-0 px-1 btn btn-sm mt-1 btn-info" type="submit">ثبت</button>
+                    </form>
+
+                    <h4 class="bold">
+                        <span>  نام کاربر :</span> <%= user.name %>
+                    </h4>
+                </figure>
+                
+            </div>
+            <div class="col-8">
+                <% 
+                    let unique_errorMessages = [...new Set(errorMessages)]
+                %>
+                <% if(unique_errorMessages.length > 0) { %>
+                    <% for(let message of unique_errorMessages) { %>
+                        <div class="alert alert-danger alert-dismissible fade show" role="alert"> 
+                                <%= message %>
+                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                        </div>
+                    <% } %>
+                <% } %>
+
+                <ul class="list-group">
+                    <!-- <li class="list-group-item"><span> ایدی کاربر :</span> <%= user.id %></li> -->
+                    <li class="list-group-item">  نام کاربر :</span> <%= user.name %></li>
+                    <li class="list-group-item">  ایمیل کاربر :</span> <%= user.email %></li>
+                    <li class="list-group-item">  رمز عبور کاربر :</span> ××××××××××××××</li>
+                    <li class="list-group-item">  سطح دسترسی کاربر :</span> <%= user.accessLevelId %></li>
+                </ul>
+                <br>
+                <!-- edit profile -->
+                <form action="/profile/edit" method="POST">
+                    <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+                    <input type="hidden" name="userId" value="<%= user.id %>">
+                    <button class="btn btn-warning">ویرایش</button>
+                </form>
+            </div>
+        <% } else { %>
+            <form action="/profile" method="POST" class="mx-auto text-center" style="width: 500px">
+
+                <!-- warning -->
+                 
+                <div class="alert alert-warning text-center" role="alert">
+                    <h5 style="font-weight: 700;" class="mb-0 py-3">فقط مقادیری را که میخواهید تغییر دهید وارد کنید</h5>
+                </div>
+
+                
+                <div class="mx-auto">
+                    <label class="d-block" for="name">نام</label>
+                    <input class="form-control" type="text" name="name">
+                </div>
+
+                <br>
+
+                <div class="mx-auto">
+                    <label class="d-block" for="email">ایمیل</label>
+                    <input class="form-control" type="email" name="email">
+                </div>
+
+                <br>
+
+                <div class="mx-auto">
+                    <label class="d-block" for="password">رمز عبور</label>
+                    <input class="form-control" type="password" name="password">
+                </div>
+
+                <br>
+
+                <div class="mx-auto">
+                    <label class="d-block" for="confirmPassword">تکرار رمز عبور</label>
+                    <input class="form-control" type="password" name="confirmPassword">
+                </div>
+
+                
+                <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+
+                <input type="hidden" name="userId" value="<%= user.id %>">
+
+                <br>
+
+                <button type="submit" class="btn btn-primary">ثبت</button>
+            </form>
+        <% } %>
+        
+    </div>
+    <!-- END -->
+    <%- include('../includes/end')%>

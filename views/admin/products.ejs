@@ -1,0 +1,186 @@
+<%- include('../includes/head')%>
+	
+		<!-- <script src="https://cdn.tiny.cloud/1/4z9rr87tpipnjdto5g5wbi27t8dvhugvpd4equfh837qbxkl/tinymce/5/tinymce.min.js" referrerpolicy="origin"></script> -->
+		 <script src="/js/tinymce.min.js"></script>
+		<script>
+			tinymce.init({
+				selector: '#attributes',
+				menubar: 'table | view',
+				plugins: ['table | preview advlist autolink lists link image charmap print preview anchor',
+    					'searchreplace visualblocks code fullscreen directionality',
+    					'insertdatetime media table paste code help wordcount'] ,
+				toolbar: 'preview | table tabledelete | tableprops tablerowprops tablecellprops | tableinsertrowbefore tableinsertrowafter tabledeleterow | tableinsertcolbefore tableinsertcolafter tabledeletecol' + 'undo redo | formatselect | ' +
+						'bold italic backcolor | alignleft aligncenter ltr rtl ' +
+						'alignright alignjustify | bullist numlist outdent indent | ' +
+						'removeformat | help'
+				});
+		</script>
+
+	</head>
+
+	<body>
+		<!-- navigation -->
+		<%- include('../includes/admin-navigation')%>
+
+
+			<div class="row mx-0">
+				<!-- sidebar  -->
+				<%- include('../includes/admin-sidebar')%>
+
+					<!-- add product  -->
+					<div class="px-5 col-10 products">
+
+						
+						<!-- title  -->
+						<div class="alert alert-primary text-center mt-3" role="alert">
+                            <h3 style="font-weight: 700;" class="mb-0 py-1">محصولات</h3>
+                        </div>
+
+
+						
+						<form class="form-control rounded p-4" action="<%= editMode ? '/admin/product/edit' : '/admin/product'%>" method="POST" enctype="multipart/form-data">
+							<!-- Flash errors and messages -->
+							<!-- delete duplicate sentenses -->
+							<% 
+								let unique_errorMessages = [...new Set(errorMessages)]
+							%>
+							<% if(unique_errorMessages.length > 0) { %>
+								<% for(let message of unique_errorMessages) { %>
+									<div class="alert alert-danger alert-dismissible fade show mx-auto mt-2" role="alert"> 
+											<%= message %>
+										<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+									</div>
+								<% } %>
+							<% } %>
+
+							<div class="row flex-row">
+								<!-- column ONE -->
+								<div class="col-6">
+									<!-- product title -->
+									<div>
+										<label for="title">نام محصول</label>
+										<input class=" <%= errors.some(e => e.param == 'title') ? 'invalid' : '' %>" type="text" id="title" name="title" value="<%= oldInput.title ? oldInput.title : editMode ? product.title : '' %>">
+									</div>
+
+									<br>
+
+									 <!-- category Link -->
+									<div>
+										<label for="link">لینک</label>
+										<input class=" <%= errors.some(e => e.param == 'link') ? 'invalid' : '' %>" type="text" id="link" name="link" value="<%= oldInput.link ? oldInput.link : editMode ? product.link : ''%>" />
+									</div>
+
+									<br>
+
+									<!-- prdouct description -->
+									<div>
+										<label for="description">توضیحات محصول</label>
+										<input class=" <%= errors.some(e => e.param == 'description') ? 'invalid' : '' %>" type="text" id="description" name="description" value="<%= oldInput.description ? oldInput.description : editMode ? product.description : ''%>">
+									</div>
+								</div>
+								<!-- column TWO -->
+								<div class="col">
+									<!-- product price -->
+									<div>
+										<label for="number">قیمت</label>
+										<input class=" <%= errors.some(e => e.param == 'price') ? 'invalid' : '' %>" type="number" id="number" name="price"  value="<%= oldInput.price ? oldInput.price :  editMode ? product.price : ''%>">
+									</div>
+
+									
+
+									<br>
+									<!-- product category -->
+									<div>
+										<label for="category">دسته بندی</label>
+										<% if(editMode) { %>
+											<select name="categoryId" id="category">
+												<!-- product category -->
+												<option value="<%= product.categoryId || '' %>"> <%= product.category ? product.category.title : '' %></option>
+												<% for(let category of categories) { %>
+													<!-- other categories -->
+													<%if(category.id != product.category.id) { %>
+													<option value="<%= category.id %>">
+														<%= category.title %>
+													</option>
+													<% } %>
+												<% } %>
+											</select>
+										<% } else { %>
+											<select class="form-select form-select" name="categoryId" id="category">
+												<option selected>یک دسته را انتخاب کنید</option>
+													<% for(let category of categories) { %>
+														<option value="<%= category.id %>">
+															<%= category.title %>
+														</option>
+												<% } %>
+											</select>
+										<% } %>
+										
+									</div>
+
+								</div>
+								<!-- attributes -->
+								<div class="col-12">
+									<label for="attributes">ویژگی</label>
+									
+									<!-- textarea  -->
+									<textarea cols="80" id="attributes" name="attributes" rows="10">
+										<%= oldInput.attributes ? oldInput.attributes :  editMode ? product.attributes : ''%>
+									</textarea>
+									
+								</div>
+							</div>
+							<!-- csrfToken -->
+							<input type="hidden" name="_csrf" value="<%= csrfToken %>">
+
+							<% if(editMode) {%>
+								<input type="hidden" name="productId" value="<%= product.id %>">
+							<% } %>
+
+							
+
+							<br>
+							<div>
+								<label for="image">تصویر</label>
+								<input type="file" name="image" id="image" />
+							</div>
+							<input type="submit" value="ثبت">
+						</form>
+						<br>
+						<%if(!editMode) {%>
+						<!-- tabel of products -->
+						<table class="table text-center">
+							<thead>
+								<tr>
+									<th scope="col">#</th>
+									<th scope="col">نام</th>
+									<th scope="col">قیمت</th>
+									<th scope="col">دسته</th>
+									<th scope="col">ویرایش</th>
+								</tr>
+							</thead>
+							<tbody>
+								<% for(let product of products) { %>
+									<!-- product detail -->
+									<tr>
+										<th><%= product.id %></th>
+										<td><a href="/product/<%= product.id %>" class="text-decoration-none"><%= product.title %></a></td>
+										<td><%= product.price %></td>
+										<td><%= product.category ? product.category.title : 'نامشخص' %></td>
+										<td class="d-flex justify-content-center">
+											<form action="/admin/product/delete" method="POST">
+        										<input type="hidden" name="_csrf" value="<%= csrfToken %>">
+												<input type="hidden" name="productId" value="<%= product.id %>">
+												<button class="btn btn-danger btn-sm mx-1" > حذف</button>
+											</form>
+											<a class="btn btn-sm btn-info mx-1" href="/admin/product/edit?id=<%=product.id%>">ادیت</a>
+										</td>
+									</tr>
+								<% } %>
+							</tbody>
+						</table>
+					<%}%>
+					</div>
+			</div>
+			
+			<%- include('../includes/end')%>

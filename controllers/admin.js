@@ -1,0 +1,505 @@
+const AccessLevel = require('../models/access-level');
+const Category = require('../models/category');
+const Product = require('../models/product');
+const User = require('../models/user');
+const Comment = require('../models/comment');
+const { deleteFile, upload } = require('../util/file');
+const { validationResult } = require('express-validator');
+
+exports.getAdmin = (req, res, next) => {
+    res.status(200).render('admin/dashboard', {
+        path: '/admin',
+        user: req.user,
+        title: 'داشبورد'
+    });
+};
+
+exports.getProducts = async (req, res, next) => {
+    try {
+        const editMode = false;
+        // find all products
+        const products = await Product.findAll({ include: Category });
+        // find all categories
+        const categories = await Category.findAll();
+        res.status(200).render('admin/products', {
+            user: req.user,
+            products,
+            product: {},
+            categories,
+            editMode,
+            errorMessages: req.flash('errorMessages'),
+            path: '/admin/products',
+            oldInput: {
+                title: '',
+                price: '',
+                description: '',
+                link: '',
+                categoryId: '',
+                attributes: ''
+            },
+            errors: [],
+            title: 'محصولات'
+        });
+    } catch (error) {
+        console.log(error);
+    }
+};
+
+exports.postAddProduct = async (req, res, next) => {
+    try {
+        // image
+        let image = req.file;
+        if (!image) {
+            image = '';
+        }
+
+        const {
+            title,
+            price,
+            description,
+            link,
+            categoryId,
+            attributes
+        } = req.body;
+
+        console.log(req.body);
+
+        // express validator
+        const errors = validationResult(req);
+
+        if (!errors.isEmpty()) {
+            // needed information
+            const editMode = false;
+            // find all products
+            const products = await Product.findAll({ include: Category });
+            // find all categories
+            const categories = await Category.findAll();
+            // re-render
+            return res.status(400).render('admin/products', {
+                user: req.user,
+                products,
+                categories,
+                editMode,
+                path: '/admin/products',
+                errorMessages: ['لطفا این فیلد ها را با مقدار مناسب پر کنید'],
+                oldInput: {
+                    title,
+                    price,
+                    description,
+                    link,
+                    categoryId,
+                    attributes
+                },
+                errors: errors.array(),
+                title: 'محصولات'
+            });
+        }
+
+        const product = await Product.create({
+            title,
+            price,
+            description,
+            categoryId,
+            link,
+            image: image.path,
+            attributes
+        });
+        res.redirect('/admin/products');
+    } catch (error) {
+        console.log(error);
+    }
+};
+
+exports.postDeleteProduct = async (req, res, next) => {
+    const { productId } = req.body;
+    try {
+        const product = await Product.findByPk(productId);
+        // delete image from storage
+        if(product.image) {
+            deleteFile(product.image);
+        }
+        await product.destroy();
+        res.redirect('/admin/products');
+    } catch (error) {
+        console.log(error);
+    }
+};
+
+exports.getEditProduct = async (req, res, next) => {
+    const productId = req.query.id;
+    try {
+        // find product and its category
+        const product = await Product.findByPk(productId, {
+            include: {
+                model: Category
+            }
+        });
+        // find all categories
+        const categories = await Category.findAll();
+
+        res.status(200).render('admin/products', {
+            user: req.user,
+            editMode: true,
+            product,
+            categories,
+            path: '/admin/products',
+            errorMessages: req.flash('errorMessages'),
+            oldInput: {
+                title: '',
+                price: '',
+                description: '',
+                link: '',
+                categoryId: '',
+                attributes: ''
+            },
+            errors: [],
+            title: 'محصولات'
+        });
+    } catch (error) {
+        console.log(error);
+    }
+};
+
+exports.postEditProduct = async (req, res, next) => {
+    try {
+        const {
+            title,
+            link,
+            price,
+            description,
+            categoryId,
+            productId,
+            attributes
+        } = req.body;
+
+        console.log(productId);
+
+        // express validator
+        const errors = validationResult(req);
+
+        if (!errors.isEmpty()) {
+            // needed information
+            const editMode = true;
+            // find all products
+            const product = await Product.findByPk(productId, {
+                include: Category
+            });
+            // find all categories
+            const categories = await Category.findAll();
+            // re-render
+            return res.status(400).render('admin/products', {
+                user: req.user,
+                product,
+                categories,
+                editMode,
+                path: '/admin/products',
+                errorMessages: ['لطفا این فیلد ها را با مقدار مناسب پر کنید'],
+                oldInput: {
+                    title,
+                    price,
+                    description,
+                    link,
+                    categoryId,
+                    attributes
+                },
+                errors: errors.array(),
+                title: 'محصولات'
+            });
+        }
+
+        let image = req.file;
+        // find product
+        let product = await Product.findByPk(productId);
+        //  if new image --- delete old image
+        if (image) {
+            deleteFile(product.image);
+            image = image.path;
+            product.image = image;
+        }
+        product.title = title;
+        product.price = price;
+        product.description = description;
+        product.categoryId = categoryId;
+        product.attributes = attributes;
+        await product.save();
+        res.redirect('/admin/products');
+    } catch (error) {
+        console.log(error);
+    }
+};
+
+exports.getCategories = async (req, res, next) => {
+    // get all categories
+    try {
+        const editMode = false;
+        const categories = await Category.findAll();
+        res.status(200).render('admin/categories', {
+            user: req.user,
+            categories,
+            path: '/admin/categories',
+            editMode,
+            errors: [],
+            errorMessages: req.flash('errorMessages'),
+            oldInput: { title: '', description: '', link: '' },
+            title: 'دسته بندی محصولات'
+        });
+    } catch (error) {
+        console.log(error);
+    }
+};
+
+exports.postDeleteCategory = async (req, res, next) => {
+    const { categoryId } = req.body;
+    try {
+        // find category
+        const category = await Category.findByPk(categoryId);
+        // cant't delete uncategorized category
+        if (
+            categoryId == 1 ||
+            category.link.toLowerCase() == 'uncategorized' ||
+            category.link.toLowerCase() == 'all'
+        ) {
+            req.flash('errorMessages', [
+                'نمیتوانید این دسته بندی را حذف کنید.'
+            ]);
+            req.session.save((err) => {
+                console.log(err);
+                return res.redirect('/admin/categories');
+            });
+        } else {
+            // set all products with that category to uncategorized
+            const products = await Product.findAll({
+                where: { categoryId: categoryId }
+            });
+            products.map(async (p) => {
+                p.categoryId = 1;
+                await p.save();
+            });
+            // delete category
+            await category.destroy();
+            // redirect
+            res.redirect('/admin/categories');
+        }
+    } catch (error) {
+        console.log(error);
+    }
+};
+
+exports.postCategory = async (req, res, next) => {
+    const { title, description, link } = req.body;
+    try {
+        // express validator
+        const errors = validationResult(req);
+
+        if (!errors.isEmpty()) {
+            // needed information
+            const categories = await Category.findAll();
+            // editMode
+            const editMode = false;
+            // re-render
+            return res.status(200).render('admin/categories', {
+                user: req.user,
+                categories,
+                path: '/admin/categories',
+                editMode,
+                errorMessages: ['این فیلد ها را پر کنید'],
+                errors: errors.array(),
+                oldInput: { title, description, link },
+                title: 'دسته بندی محصولات'
+            });
+        }
+        const category = await Category.create({ title, description, link });
+        res.redirect('/admin/categories');
+    } catch (error) {
+        console.log(error);
+    }
+};
+
+exports.getEditCategory = async (req, res, next) => {
+    const categoryId = req.query.id;
+    try {
+        // find all categories
+        const categories = await Category.findAll();
+        // find product and its category
+        const category = await Category.findByPk(categoryId);
+
+        // protect sensetive category :))
+        if (
+            category.id == 1 ||
+            category.link.toLowerCase() == 'uncategorized' ||
+            category.link.toLowerCase() == 'all'
+        ) {
+            req.flash('errorMessages', [
+                'نمیتوانید این دسته بندی ها را ویرایش کنید.'
+            ]);
+            req.session.save((err) => {
+                console.log(err);
+                return res.redirect('/admin/categories');
+            });
+            return;
+        }
+
+        res.status(200).render('admin/categories', {
+            user: req.user,
+            editMode: true,
+            categories,
+            category,
+            errors: [],
+            errorMessages: req.flash('errorMessages'),
+            path: '/admin/categories',
+            oldInput: { title: '', link: '', description: '' },
+            title: 'دسته بندی محصولات'
+        });
+    } catch (error) {
+        console.log(error);
+    }
+};
+
+exports.postEditCategory = async (req, res, next) => {
+    try {
+        const { title, description, categoryId, link, attributes } = req.body;
+
+        let category = await Category.findByPk(categoryId);
+
+        // express validator
+        const errors = validationResult(req);
+
+        if (!errors.isEmpty()) {
+            // needed information
+            const categories = await Category.findAll();
+            // editMode
+            const editMode = true;
+            // re-render
+            return res.status(200).render('admin/categories', {
+                user: req.user,
+                categories,
+                path: '/admin/categories',
+                editMode,
+                category,
+                errorMessages: ['این فیلد ها را پر کنید'],
+                errors: errors.array(),
+                oldInput: { title, description, link },
+                title: 'دسته بندی محصولات'
+            });
+        }
+
+        category.title = title;
+        category.description = description;
+        category.link = link;
+        await category.save();
+        res.redirect('/admin/categories');
+    } catch (error) {
+        console.log(error);
+    }
+};
+
+exports.getAccesses = async (req, res, next) => {
+    try {
+        // find all users
+        const users = await User.findAll({ include: AccessLevel });
+
+        res.render('admin/accesses', {
+            users,
+            path: '/admin/accesses',
+            errorMessages: req.flash('errorMessages'),
+            editMode: false,
+            user: req.user,
+            title: 'کاربران'
+        });
+    } catch (error) {
+        console.log(error);
+    }
+};
+
+exports.postAccesses = async (req, res, next) => {
+    try {
+        const { userId, accessLevelId, accessLevel, email, name } = req.body;
+        // find user
+        const user = await User.findByPk(userId);
+        // set new data
+        // user.accessLevel = accessLevel;
+        user.accessLevelId = accessLevelId;
+        user.email = email;
+        user.name = name;
+
+        // save changes -- update
+        await user.save();
+
+        res.redirect('/admin/accesses');
+    } catch (error) {
+        console.log(error);
+    }
+};
+
+exports.getEditAccesses = async (req, res, next) => {
+    try {
+        const userId = req.query.id;
+        // find users
+        const user = await User.findByPk(userId, { include: AccessLevel });
+        const users = await User.findAll({ include: AccessLevel });
+
+        // if user is super admin
+        if (user.id == 1) {
+            req.flash('errorMessages', [' ادمین اصلی را نمیتوانید ادیت کنید']);
+            req.session.save((err) => {
+                console.log(err);
+                return res.redirect('/admin/accesses');
+            });
+        } else {
+            res.render('admin/accesses', {
+                user,
+                users,
+                editMode: true,
+                path: '/admin/accesses',
+                errorMessages: req.flash('errorMessages'),
+                title: 'کاربران'
+            });
+        }
+    } catch (error) {
+        console.log(error);
+    }
+};
+
+exports.getComments = async (req, res, next) => {
+    try {
+        const comments = await Comment.findAll({
+            include: Product,
+            order: [['commentStatusId', 'ASC' ]]
+        });
+
+        res.render('admin/comments', {
+            comments,
+            path: '/admin/comments',
+            title: 'کامنت ها',
+            user: req.user
+        });
+    } catch (error) {
+        console.log(error);
+    }
+};
+
+exports.postCommentStatus = async (req, res, next) => {
+    try {
+        const { commentStatusId, commentId } = req.body;
+        const comment = await Comment.findByPk(commentId);
+        console.log(req.body);
+        comment.commentStatusId = commentStatusId;
+        await comment.save();
+        res.redirect('/admin/comments');
+    } catch (error) {
+        console.log(error);
+    }
+};
+
+exports.postDeleteComment = async (req, res, next) => {
+    try {
+        const { commentId } = req.body;
+        const comment = await Comment.findByPk(commentId);
+
+        await comment.destroy();
+
+        res.redirect('/admin/comments');
+    } catch (error) {
+        console.log(error);
+    }
+};

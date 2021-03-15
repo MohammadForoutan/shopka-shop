@@ -1,0 +1,39 @@
+<%- include('../includes/head')%>
+
+</head>
+<body>
+    <!-- navigation -->
+    <%- include('../includes/admin-navigation')%>
+    <%- include('../includes/navigation')%>
+    <%- include('../includes/menu')%>
+    
+
+    <form style="width: 300px;" class="mx-auto mt-4" action="/auth/reset" method="post">
+        <div class="alert alert-primary text-center" role="alert">
+            <h3 style="font-weight: 700;" class="mb-0 py-3">فراموشی رمز</h3>
+        </div>
+        
+        <% 
+            let unique_errorMessages = [...new Set(errorMessages)]
+        %>
+        <% if(unique_errorMessages.length > 0) { %>
+            <% for(let message of unique_errorMessages) { %>
+                <div class="alert alert-danger alert-dismissible fade show" role="alert"> 
+                        <%= message %>
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            <% } %>
+        <% } %>
+        <!-- EMAIL -->
+        <div class="mb-3">
+            <label for="email" class="form-label">ایمیل</label>
+            <input name="email" type="email" class="form-control text-right" dir="rtl" id="email" placeholder="ایمیل">
+        </div>
+        <!-- csrfToken -->
+        <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+        <input class="btn btn-primary" type="submit" value="ارسال">
+        <br>
+        <br>
+    </form>
+    <!-- END -->
+    <%- include('../includes/end')%>

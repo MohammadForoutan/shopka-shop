@@ -1,0 +1,96 @@
+<%- include('../includes/head')%>
+</head>
+<body>
+    <!-- navigation -->
+    <%- include('../includes/admin-navigation')%>
+    
+
+    <div class="row mx-0">
+        <!-- admin sidebar  -->
+        <%- include('../includes/admin-sidebar')%>
+        <!-- shop items -->
+        <div class="px-5 col-10">
+            
+        
+            <div class="alert alert-primary text-center mt-3" role="alert">
+                <h3 style="font-weight: 700;" class="mb-0 py-1">دسته بندی</h3>
+            </div>
+            <form class="border rounded p-4" action="<%= editMode ? '/admin/category/edit' : '/admin/category'%>" method="POST" class="form-control">
+                <!-- Flash errors and messages -->
+                <% 
+                    let unique_errorMessages = [...new Set(errorMessages)]
+                %>
+                <% if(unique_errorMessages.length > 0) { %>
+                    <% for(let message of unique_errorMessages) { %>
+                        <div class="alert alert-danger alert-dismissible fade show" role="alert"> 
+                                <%= message %>
+                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                        </div>
+                    <% } %>
+                <% } %>
+                <div class="row">
+                    <div class="col-6">
+                        <!-- category title -->
+                        <div>
+                            <label for="title">عنوان</label>
+                            <input class=" <%= errors.some(e => e.param == 'title') ? 'invalid' : '' %>" type="text" id="title" name="title" value="<%= oldInput.title ? oldInput.title : editMode ? category.title : ''%>">
+                        </div>
+
+                        <br>
+                         <!-- category Link -->
+                        <div>
+                            <label for="link">لینک</label>
+                            <input class=" <%= errors.some(e => e.param == 'link') ? 'invalid' : '' %>" type="text" id="link" name="link" value="<%= oldInput.link ? oldInput.link : editMode ? category.link : ''%>" />
+                        </div>
+                    </div>
+                    <div class="col-6">
+                        <!-- category description -->
+                        <div>
+                            <label for="description">توضیحات</label>
+                            <input class=" <%= errors.some(e => e.param == 'description') ? 'invalid' : '' %>" type="text" id="description" name="description" value="<%= oldInput.description ? oldInput.description : editMode ? category.description : ''%>">
+                        </div>
+                    </div>
+                </div>
+
+                <br>
+                <% if(editMode) {%>
+                    <input type="hidden" name="categoryId" value="<%= category.id %>">
+                <% } %>
+                <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+                <button class="btn btn-primary" type="submit" "> ثبت</button>
+            </form>
+           <br>
+           <br>
+           <!-- categories table -->
+           <table class="table text-center">
+            <thead>
+              <tr>
+                <th scope="col">#</th>
+                <th scope="col">نام</th>
+                <th scope="col">توضیحات</th>
+                <th scope="col">ویرایش</th>
+              </tr>
+            </thead>
+            <tbody>
+                <% for(let category of categories) { %>
+                    <!-- product detail -->
+                    <tr>
+                      <th><%= category.id %></th>
+                      <td><%= category.title %></td>
+                      <td><%= category.description || 'توضیحات ندارد' %></td>
+                      <td class="d-flex justify-content-center">
+                          <a class="btn btn-info btn-sm mx-1" href="/admin/category/edit?id=<%= category.id %>">ادیت</a>
+                          <form action="/admin/category/delete" method="POST">
+                            <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+                            <input type="hidden" name="categoryId" value="<%= category.id %>">
+                            <button class="btn btn-danger btn-sm mx-1" > حذف</button>
+                          </form> 
+                      </td>
+                    </tr>
+                <% } %>
+            </tbody>
+          </table>
+        </div>
+    </div>
+
+    <%- include('../includes/end')%>

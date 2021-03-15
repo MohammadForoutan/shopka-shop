@@ -1,0 +1,58 @@
+<%- include('../includes/head')%>
+
+</head>
+<body>
+    <!-- navigation -->
+    <%- include('../includes/admin-navigation')%>
+    <%- include('../includes/navigation')%>
+    <%- include('../includes/menu')%>
+    
+    <div class="alert alert-primary text-center mb-0" role="alert">
+       <h3 style="font-weight: 700;" class="mb-0 py-3">سبد خرید</h3>
+    </div>
+
+    <br>
+
+    <% if(products.length > 0) { %>
+    <!-- CART - ITEMS  -->
+    <form class="container" action="/order" method="POST">
+        <!-- csrfToken -->
+        <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+        <button type="submit" class="btn btn-success">سفارش</button>
+    </form>
+    <table class="table container text-center">
+        <thead>
+            <tr>
+                <th scope="col">ایدی محصول</th>
+                <th scope="col">تعداد</th>
+                <th scope="col">نام محصول</th>
+                <th scope="col">حذف از سبد</th>
+            </tr>
+        </thead>
+        <tbody>
+            <% for(let product of products) { %>
+                <!-- product detail -->
+                <tr>
+                    <th><%= product.id %> #</th>
+                    <td><%= product.cartItem.quantity %></td>
+                    <td><%= product.title %></td>
+                    <td>
+                        <form action="/cart/delete" method="POST">
+                            <input type="hidden" name="productId" value="<%= product.id %>">
+                            <!-- csrfToken -->
+                            <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+                            <button type="submit" class="btn btn-danger btn-sm p-2 py-0 btn-sm">حذف</button>
+                        </form>
+                    </td>
+                </tr>
+            <% } %>
+        </tbody>
+    </table>
+    <% }  else { %>
+        <div style='width: 500px;' class="container alert alert-danger text-center" role="alert">
+            <h4 style="font-weight: 400;" class="mb-0 py-1">سبد خرید خالیست</h4>
+        </div>
+    <% } %>
+
+    <!-- END -->
+    <%- include('../includes/end')%>
