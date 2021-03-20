@@ -3,6 +3,8 @@ const crypto = require('crypto');
 const bcrypt = require('bcryptjs');
 const User = require('../models/user');
 
+const { flashError } = require('../util/error');
+
 exports.getLogin = async (req, res, next) => {
     try {
         const user = req.user;
@@ -171,22 +173,14 @@ exports.postResetPassword = async (req, res, next) => {
         const user = await User.findOne({ where: { email: email } });
         // if user not found = user not log in
         if (!user) {
-            req.flash('errorMessages', ['کاربری با این ایمیل یافت نشد']);
-            req.session.save((err) => {
-                console.log(err);
-                return res.redirect('/auth/reset');
-            });
+            flashError(req, res,'کاربری با این ایمیل یافت نشد', '/auth/reset')
         }
         // crypto
         crypto.randomBytes(32, async (err, buffer) => {
             if (err) {
                 // log error
                 console.log(err);
-                req.flash('errorMessages', ['دوباره تلاش کنید.']);
-                req.session.save((err) => {
-                    console.log(err);
-                    return res.redirect('/auth/reset');
-                });
+                flashError(req, res, 'دوباره تلاش کنید.','/auth/reset')
             }
             // generate token
             const token = buffer.toString('hex');
@@ -195,11 +189,7 @@ exports.postResetPassword = async (req, res, next) => {
             user.resetTokenExpiration = Date.now() + 3600000;
             await user.save();
 
-            req.flash('errorMessages', ['ایمیل ارسال شد.']);
-            req.session.save((err) => {
-                console.log(err);
-                return res.redirect('/auth/reset');
-            });
+            flashError(req, res, 'ایمیل ارسال شد.', '/auth/reset')
         }); // end crypto
     } catch (error) {
         console.log(error);
@@ -213,12 +203,7 @@ exports.getNewPassword = async (req, res, next) => {
         const user = await User.findOne({ where: { resetToken: resetToken } });
         // if user not found
         if (!user) {
-            req.flash('errorMessages', ['کاربری با این توکن یافت نشد']);
-            req.session.save((err) => {
-                console.log(err);
-                return res.redirect('/auth/login');
-            });
-            return;
+            flashError(req,res,'کاربری با این توکن یافت نشد','/auth/login')
         }
 
         res.render('auth/new-password', {

@@ -3,8 +3,10 @@ const PDFDocument = require('pdfkit');
 const Category = require('../models/category');
 const Comment = require('../models/comment');
 const User = require('../models/user');
-const {deleteFile} = require('../util/file')
+const { deleteFile } = require('../util/file');
 const bcrypt = require('bcryptjs');
+
+const { flashError } = require('../util/error');
 
 // limit per page
 const LIMIT_PER_PAGE = 2;
@@ -28,12 +30,11 @@ exports.getIndex = (req, res, next) => {
 exports.getShop = async (req, res, next) => {
     try {
         // take data from query
-        let { page, categoryId, } = req.query;
+        let { page, categoryId } = req.query;
         categoryId = categoryId || ALL_ID;
         page = page || 1;
         const offset = LIMIT_PER_PAGE * (page - 1);
 
-        
         let productsDetail;
         let productsCount;
         let products;
@@ -44,14 +45,14 @@ exports.getShop = async (req, res, next) => {
             products = await Product.findAll({
                 where: { categoryId },
                 offset,
-                limit: LIMIT_PER_PAGE,
+                limit: LIMIT_PER_PAGE
             });
         } else {
             productsDetail = await Product.findAndCountAll();
             productsCount = productsDetail.count;
             products = products = await Product.findAll({
                 offset,
-                limit: LIMIT_PER_PAGE,
+                limit: LIMIT_PER_PAGE
             });
         }
 
@@ -69,7 +70,7 @@ exports.getShop = async (req, res, next) => {
             categories,
             title: 'فروشگاه',
             pages,
-            page,
+            page
         });
     } catch (error) {
         console.log(error);
@@ -81,18 +82,15 @@ exports.getProduct = async (req, res, next) => {
         const { productId } = req.params;
         const product = await Product.findByPk(productId);
 
-
         if (!product) {
-            req.flash('errorMessages', ['چنین محصولی وجود ندارد.']);
-            req.session.save((err) => {
-                console.log(err);
-                return res.redirect('/shop');
-            });
-            return;
+            flashError(req, res, 'چنین محصولی وجود ندارد.', '/shop');
         }
 
         // comment
-        const comments = await product.getComments({include: User, where: {commentStatusId: 2}});
+        const comments = await product.getComments({
+            include: User,
+            where: { commentStatusId: 2 }
+        });
         // return res.json({comments})
 
         res.status(200).render('shop/product', {
@@ -115,12 +113,12 @@ exports.postAddComment = async (req, res, next) => {
         const { productId, content } = req.body;
         let commentStatusId;
 
-        if(req.user.accessLevelId == ADMIN_ACCESS_LEVEL) {
+        if (req.user.accessLevelId == ADMIN_ACCESS_LEVEL) {
             commentStatusId = 2;
-        } 
-        if(req.user.accessLevelId == MEMBER_ACCESS_LEVEL) {
+        }
+        if (req.user.accessLevelId == MEMBER_ACCESS_LEVEL) {
             commentStatusId = 1;
-        } 
+        }
 
         await Comment.create({
             content,
@@ -141,25 +139,19 @@ exports.postGetEditComment = async (req, res, next) => {
 
         const product = await Product.findByPk(productId);
         if (!product) {
-            req.flash('errorMessages', ['چنین محصولی وجود ندارد.']);
-            req.session.save((err) => {
-                console.log(err);
-                return res.redirect('/shop');
-            });
-            return;
+            flashError(req, res, 'چنین محصولی وجود ندارد.', '/shop');
         }
 
         // comment
-        const comments = await product.getComments({include: User, where: {commentStatusId: 2}});
-        
-        const comment = await Comment.findByPk(commentId)
-        
-        if(comment.userId != req.user.id) {
-            req.flash('errorMessages', ['این کامنت برای شما نیست'])
-            req.session.save(err => {
-                console.log(err);
-                return res.redirect(`/product/${productId}`);
-            })
+        const comments = await product.getComments({
+            include: User,
+            where: { commentStatusId: 2 }
+        });
+
+        const comment = await Comment.findByPk(commentId);
+
+        if (comment.userId != req.user.id) {
+            flashError('این کامنت برای شما نیست', `/product/${productId}`);
         }
 
         res.status(200).render('shop/product', {
@@ -174,33 +166,33 @@ exports.postGetEditComment = async (req, res, next) => {
     } catch (error) {
         console.log(error);
     }
-}
+};
 
 exports.postPostEditComment = async (req, res, next) => {
     try {
-        const {commentId} = req.params;
-        const {productId, content} = req.body;
+        const { commentId } = req.params;
+        const { productId, content } = req.body;
 
         const comment = await Comment.findByPk(commentId);
 
-
-        if(comment.userId != req.user.id) {
-            req.flash('errorMessages', ['این کامنت برای شما نیست'])
-            req.session.save(err => {
-                console.log(err);
-                return res.redirect(`/product/${productId}`);
-            })
+        if (comment.userId != req.user.id) {
+            flashError(
+                req,
+                res,
+                'این کامنت برای شما نیست',
+                `/product/${productId}`
+            );
         }
 
         comment.content = content;
-        comment.commentStatusId = req.user.accessLevelId
+        comment.commentStatusId = req.user.accessLevelId;
 
         await comment.save();
         res.redirect(`/product/${productId}`);
     } catch (error) {
         console.log(err);
     }
-}
+};
 
 exports.getProfile = async (req, res, next) => {
     try {
@@ -216,11 +208,11 @@ exports.getProfile = async (req, res, next) => {
     }
 };
 
-exports.postGetEditProfile = async(req, res, next) => {
+exports.postGetEditProfile = async (req, res, next) => {
     try {
-        const {userId} = req.body
+        const { userId } = req.body;
 
-        if(+userId !== req.user.id) {
+        if (+userId !== req.user.id) {
             return res.redirect('/');
         }
 
@@ -231,53 +223,51 @@ exports.postGetEditProfile = async(req, res, next) => {
             path: '/profile',
             user: user,
             title: 'پروفایل کاربر'
-        })
-
+        });
     } catch (error) {
         console.log(error);
     }
-}
+};
 
-exports.postPostEditProfile = async(req, res, next) => {
+exports.postPostEditProfile = async (req, res, next) => {
     try {
-        const {userId, name, email, password, confirmPassword} = req.body;
+        const { userId, name, email, password, confirmPassword } = req.body;
         const user = await User.findByPk(userId);
-        
+
         user.name = name || user.name;
         user.email = email || user.email;
 
-        if(password === confirmPassword) {
+        if (password === confirmPassword) {
             const newPassword = await bcrypt.hash(password, 12);
             user.password = newPassword;
         }
 
-        if(password !== confirmPassword) {
-            req.flash('errorMessages', ['رمز عبور و تکرار با هم برابر نبودند'])
-            req.session.save(err => {
-                console.log(err);
-                return res.redirect('/profile')
-            })
+        if (password !== confirmPassword) {
+            flashError(
+                req,
+                res,
+                'رمز عبور و تکرار با هم برابر نبودند',
+                '/profile'
+            );
         }
 
-        await user.save()
+        await user.save();
 
-        res.redirect('/profile')
-
+        res.redirect('/profile');
     } catch (error) {
         console.log(error);
     }
-}
+};
 
-exports.postProfileAvatar = async(req, res, next) => {
+exports.postProfileAvatar = async (req, res, next) => {
     try {
         const user = await User.findByPk(req.user.id);
         let image = req.file;
 
-        
         if (!image) {
             image = '';
         } else {
-            deleteFile(user.avatar)
+            deleteFile(user.avatar);
             user.avatar = image.path;
             await user.save();
         }
@@ -286,7 +276,7 @@ exports.postProfileAvatar = async(req, res, next) => {
     } catch (error) {
         console.log(error);
     }
-}
+};
 
 exports.getCart = async (req, res, next) => {
     try {
@@ -366,14 +356,12 @@ exports.postOrder = async (req, res, next) => {
         const products = await cart.getProducts();
 
         if (products.length == 0) {
-            req.flash('errorMessages', [
-                'با سبد خرید خالی میخوای چی سفارش بدی حاجی؟!'
-            ]);
-            req.session.save((err) => {
-                console.log(err);
-                res.redirect('/cart');
-            });
-            return;
+            flashError(
+                req,
+                res,
+                'با سبد خرید خالی میخوای چی سفارش بدی حاجی؟!',
+                '/cart'
+            );
         }
 
         // create order
@@ -405,12 +393,7 @@ exports.getInvoice = async (req, res, next) => {
         console.log(order);
 
         if (!order) {
-            req.flash('errorMessages', ['سفارش نادرست است']);
-            req.session.save((err) => {
-                console.log(err);
-                return res.redirect('/order');
-            });
-            return;
+            flashError(req, res, 'سفارش نادرست است', '/order');
         }
 
         // pdf name

@@ -3,8 +3,11 @@ const Category = require('../models/category');
 const Product = require('../models/product');
 const User = require('../models/user');
 const Comment = require('../models/comment');
-const { deleteFile, upload } = require('../util/file');
 const { validationResult } = require('express-validator');
+
+// util
+const { deleteFile } = require('../util/file');
+const { flashError } = require('../util/error')
 
 exports.getAdmin = (req, res, next) => {
     res.status(200).render('admin/dashboard', {
@@ -259,13 +262,7 @@ exports.postDeleteCategory = async (req, res, next) => {
             category.link.toLowerCase() == 'uncategorized' ||
             category.link.toLowerCase() == 'all'
         ) {
-            req.flash('errorMessages', [
-                'نمیتوانید این دسته بندی را حذف کنید.'
-            ]);
-            req.session.save((err) => {
-                console.log(err);
-                return res.redirect('/admin/categories');
-            });
+            flashError(req ,res,'نمیتوانید این دسته بندی را حذف کنید.', '/admin/categories' )
         } else {
             // set all products with that category to uncategorized
             const products = await Product.findAll({
@@ -329,14 +326,7 @@ exports.getEditCategory = async (req, res, next) => {
             category.link.toLowerCase() == 'uncategorized' ||
             category.link.toLowerCase() == 'all'
         ) {
-            req.flash('errorMessages', [
-                'نمیتوانید این دسته بندی ها را ویرایش کنید.'
-            ]);
-            req.session.save((err) => {
-                console.log(err);
-                return res.redirect('/admin/categories');
-            });
-            return;
+            flashError(req, res,'نمیتوانید این دسته بندی ها را ویرایش کنید.', '/admin/categories' )
         }
 
         res.status(200).render('admin/categories', {
@@ -440,11 +430,7 @@ exports.getEditAccesses = async (req, res, next) => {
 
         // if user is super admin
         if (user.id == 1) {
-            req.flash('errorMessages', [' ادمین اصلی را نمیتوانید ادیت کنید']);
-            req.session.save((err) => {
-                console.log(err);
-                return res.redirect('/admin/accesses');
-            });
+            flashError(req, res, ' ادمین اصلی را نمیتوانید ادیت کنید', '/admin/accesses');
         } else {
             res.render('admin/accesses', {
                 user,
