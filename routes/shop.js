@@ -1,12 +1,11 @@
 const express = require('express');
 const router = express.Router();
-
-
-
-
 const shopController = require('../controllers/shop');
+
+
+
+
 const isAuth = require('../middleware/is-auth');
-const { upload } = require('../util/file');
 
 // GET => /
 router.get('/', shopController.getIndex);
