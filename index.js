@@ -110,9 +110,9 @@ app.use((req, res, next) => {
 });
 
 // Routes
+app.use(shopRoute);
 app.use('/admin', adminRoute);
 app.use('/auth', authRoute);
-app.use(shopRoute);
 
 // DATABASE‌ ASSOCIATION
 
