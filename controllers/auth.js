@@ -3,6 +3,8 @@ const crypto = require('crypto');
 const bcrypt = require('bcryptjs');
 const User = require('../models/user');
 
+const MEMEBER_ACCESSLEVEL_ID = 1;
+
 const { flashError } = require('../util/error');
 
 exports.getLogin = async (req, res, next) => {
@@ -29,9 +31,8 @@ exports.postLogin = async (req, res, next) => {
     try {
         const { email, password } = req.body;
 
-        // express- validator
+        // any error
         const errors = validationResult(req);
-
         if (!errors.isEmpty()) {
             return res.status(422).render('auth/login', {
                 errorMessages: ['یک ایمیل صحیح وارد کنید'],
@@ -42,8 +43,8 @@ exports.postLogin = async (req, res, next) => {
                 title: 'ورود به حساب'
             });
         }
-
         const user = await User.findOne({ where: { email: email } });
+
         // if user not found
         if (!user) {
             return res.status(400).render('auth/login', {
@@ -51,10 +52,9 @@ exports.postLogin = async (req, res, next) => {
                 path: '/auth/signup',
                 user: req.user,
                 oldInput: { email, password },
-                errors: [{ param: 'password' }],
+                errors: [{ param: 'email' }],
                 title: 'ورود به حساب'
             });
-            return;
         }
 
         const isPasswword = await bcrypt.compare(password, user.password);
@@ -101,9 +101,8 @@ exports.postSignup = async (req, res, next) => {
     try {
         const { name, email, password, confirmPassword } = req.body;
 
-        // express validator
+        // any error
         const errors = validationResult(req);
-
         if (!errors.isEmpty()) {
             return res.status(400).render('auth/signup', {
                 path: '/auth/signup',
@@ -144,9 +143,10 @@ exports.postSignup = async (req, res, next) => {
             name,
             email,
             password: hashedPassword,
-            accessLevelId: 1
+            accessLevelId: MEMEBER_ACCESSLEVEL_ID
         });
 
+        // init cart
         const cart = await user.createCart();
         res.redirect('/auth/login');
     } catch (error) {
@@ -171,7 +171,7 @@ exports.postResetPassword = async (req, res, next) => {
     try {
         const { email } = req.body;
         const user = await User.findOne({ where: { email: email } });
-        // if user not found = user not log in
+        // NOT Found user
         if (!user) {
             flashError(req, res,'کاربری با این ایمیل یافت نشد', '/auth/reset')
         }
@@ -186,7 +186,7 @@ exports.postResetPassword = async (req, res, next) => {
             const token = buffer.toString('hex');
             // set token and time
             user.resetToken = token;
-            user.resetTokenExpiration = Date.now() + 3600000;
+            user.resetTokenExpiration = Date.now() + 3600000; // 2 hour lifeTime
             await user.save();
 
             flashError(req, res, 'ایمیل ارسال شد.', '/auth/reset')
