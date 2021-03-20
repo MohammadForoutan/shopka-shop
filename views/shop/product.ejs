@@ -10,7 +10,7 @@
         <div class="row p-5">
             <div class="col-6">
                 <img class="w-50"  src="http://localhost:3000/<%= product.image %>" alt="<%= product.title %>">
-                <% if(user.accessLevelId == ADMIN_ACCESS_LEVEL) { %>
+                <% if(isAdmin) { %>
                     <a href="/admin/product/edit?id=<%=product.id%>" class="btn btn-info">ویرایش محصول</a>
                 <% } %>
             </div>
@@ -83,13 +83,15 @@
                             <p>
                                 <%= comment.content%>
                             </p>
-                            <% if(comment.user.id == user.id) { %>
-                                <form action="/comment/edit" method="POST">
-                                    <input type="hidden" name="_csrf" value="<%= csrfToken %>">
-                                    <input type="hidden" name="commentId" value="<%= comment.id  %>">
-                                    <input type="hidden" name="productId" value="<%= product.id  %>">
-                                    <button type="submit" class="m-0 p-0 small btn btn-sm btn-info">ویرایش</button>
-                                </form>
+                            <% if(isLoggedIn) { %>
+                                <% if(comment.user.id == user.id) { %>
+                                    <form action="/comment/edit" method="POST">
+                                        <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+                                        <input type="hidden" name="commentId" value="<%= comment.id  %>">
+                                        <input type="hidden" name="productId" value="<%= product.id  %>">
+                                        <button type="submit" class="m-0 p-0 small btn btn-sm btn-info">ویرایش</button>
+                                    </form>
+                                <% } %>
                             <% } %>
                         </div>
                     <% } %>

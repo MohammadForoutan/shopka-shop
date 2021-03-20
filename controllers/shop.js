@@ -1,11 +1,11 @@
 const Product = require('../models/product');
-const PDFDocument = require('pdfkit');
 const Category = require('../models/category');
 const Comment = require('../models/comment');
 const User = require('../models/user');
-const { deleteFile } = require('../util/file');
 const bcrypt = require('bcryptjs');
 
+const PDFDocument = require('pdfkit');
+const { deleteFile } = require('../util/file');
 const { flashError } = require('../util/error');
 const { isAdmin } = require('../util/user');
 
@@ -101,6 +101,7 @@ exports.getProduct = async (req, res, next) => {
             errorMessages: req.flash('errorMessages'),
             path: '/shop',
             title: 'فروشگاه',
+            isAdmin: isAdmin(req),
             comment: null,
             commentEditMode: false
         });
@@ -161,7 +162,8 @@ exports.postGetEditComment = async (req, res, next) => {
             path: '/shop',
             title: 'فروشگاه',
             comment,
-            commentEditMode: true
+            commentEditMode: true,
+            isAdmin: isAdmin(req)
         });
     } catch (error) {
         console.log(error);
