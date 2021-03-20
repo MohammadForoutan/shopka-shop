@@ -7,6 +7,7 @@ const { deleteFile } = require('../util/file');
 const bcrypt = require('bcryptjs');
 
 const { flashError } = require('../util/error');
+const { isAdmin } = require('../util/user');
 
 // limit per page
 const LIMIT_PER_PAGE = 2;
@@ -113,10 +114,9 @@ exports.postAddComment = async (req, res, next) => {
         const { productId, content } = req.body;
         let commentStatusId;
 
-        if (req.user.accessLevelId == ADMIN_ACCESS_LEVEL) {
+        if (isAdmin(req)) {
             commentStatusId = 2;
-        }
-        if (req.user.accessLevelId == MEMBER_ACCESS_LEVEL) {
+        } else {
             commentStatusId = 1;
         }
 
