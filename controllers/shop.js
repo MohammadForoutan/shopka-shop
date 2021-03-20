@@ -9,11 +9,11 @@ const { deleteFile } = require('../util/file');
 const { flashError } = require('../util/error');
 const { isAdmin } = require('../util/user');
 
-// limit per page
-const LIMIT_PER_PAGE = 2;
+
+
+const LIMIT_PER_PAGE = 2; // limit per page product in shop-page
 const ALL_ID = 2; // all_id_category
-const ADMIN_ACCESS_LEVEL = 2;
-const MEMBER_ACCESS_LEVEL = 1;
+const PUBLISHED_COMMENT_ID = 2; 
 
 exports.getIndex = (req, res, next) => {
     try {
@@ -87,12 +87,12 @@ exports.getProduct = async (req, res, next) => {
             flashError(req, res, 'چنین محصولی وجود ندارد.', '/shop');
         }
 
-        // comment
+        // comments
         const comments = await product.getComments({
             include: User,
-            where: { commentStatusId: 2 }
+            where: { commentStatusId: PUBLISHED_COMMENT_ID }
         });
-        // return res.json({comments})
+        
 
         res.status(200).render('shop/product', {
             product,
@@ -116,7 +116,7 @@ exports.postAddComment = async (req, res, next) => {
         let commentStatusId;
 
         if (isAdmin(req)) {
-            commentStatusId = 2;
+            commentStatusId = PUBLISHED_COMMENT_ID;
         } else {
             commentStatusId = 1;
         }
@@ -146,7 +146,7 @@ exports.postGetEditComment = async (req, res, next) => {
         // comment
         const comments = await product.getComments({
             include: User,
-            where: { commentStatusId: 2 }
+            where: { commentStatusId: PUBLISHED_COMMENT_ID }
         });
 
         const comment = await Comment.findByPk(commentId);
