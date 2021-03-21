@@ -77,14 +77,14 @@ router.post(
     adminController.postCategory
 );
 
-// GET => /admin/accesses
-router.get('/accesses', adminController.getAccesses);
+// GET => /admin/users
+router.get('/users', adminController.getUsers);
 
-// POST => /admin/accesses
-router.post('/accesses', adminController.postAccesses);
+// POST => /admin/users
+router.post('/users', adminController.postUpdateUsers);
 
-// GET => /admin/accesses/edit?id=id
-router.get('/accesses/edit', adminController.getEditAccesses);
+// GET => /admin/users/edit?id=id
+router.get('/users/edit', adminController.getEditUsers);
 
 // GET => /admin/comments
 router.get('/comments', adminController.getComments);

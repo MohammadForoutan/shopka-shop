@@ -36,7 +36,7 @@
                             <div class="row flex-row">
 								<!-- column ONE -->
 								<div class="col-6">
-                                    <form action="/admin/accesses" method="POST">
+                                    <form action="/admin/users" method="POST">
                                         
                                             <!-- user name-->
                                             <div>
@@ -116,7 +116,7 @@
                                             <%= user.accessLevel ? user.accessLevel.id : 'تنظیم نشده' %>
                                         </td>
                                         <td>
-                                            <a href="/admin/accesses/edit?id=<%= user.id %>" class="btn btn-warning p-1 py-0  btn-sm">ویرایش</a>
+                                            <a href="/admin/users/edit?id=<%= user.id %>" class="btn btn-warning p-1 py-0  btn-sm">ویرایش</a>
                                         </td>
                                     </tr>
                                     <% } %>

@@ -19,11 +19,11 @@
     <%- include('../includes/navigation')%>
     <%- include('../includes/menu')%>
     <div class="row mx-0">
-        <% for(let poster of posters) { %>
-            <div class="col-4">
-                <img class="w-100" src="/<%= poster.image %>" alt="<%= poster.title %>>" title="<%= poster.title %>>">
-            </div>
-        <% } %>
+        <div class="col-4">
+            <% for(let poster of posters) { %>
+                    <img src="/<%= poster.image %>" alt="<%= poster.title %>" title="<%= poster.title %>">
+            <% } %>
+        </div>
         <div class="col-8">
             <%- include('../includes/carousel')%>
         </div>
