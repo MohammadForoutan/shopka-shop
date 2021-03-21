@@ -83,15 +83,26 @@
                             <p>
                                 <%= comment.content%>
                             </p>
+                            <!-- edit modes -->
                             <% if(isLoggedIn) { %>
                                 <% if(comment.user.id == user.id) { %>
-                                    <form action="/comment/edit" method="POST">
+                                    <form class="d-inline-block" action="/comment/edit" method="POST">
                                         <input type="hidden" name="_csrf" value="<%= csrfToken %>">
                                         <input type="hidden" name="commentId" value="<%= comment.id  %>">
                                         <input type="hidden" name="productId" value="<%= product.id  %>">
-                                        <button type="submit" class="m-0 p-0 small btn btn-sm btn-info">ویرایش</button>
+                                        <button type="submit" class="p-0 px-1 small btn btn-sm btn-info">ویرایش</button>
                                     </form>
                                 <% } %>
+                            <% } %>
+                            <!-- delete - only for admin user -->
+                            <% if (isAdmin) { %>
+                                <form class="d-inline-block" action="/admin/comments/delete?product_query=<%=product.id%>" method="POST">
+                                    <input type="hidden" name="commentId" value="<%= comment.id  %>">
+                                    <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+                                    <button class="mx-1 btn-sm btn-danger p-0 px-1" type="submit">
+                                        حذف
+                                    </button>
+                                </form>
                             <% } %>
                         </div>
                     <% } %>

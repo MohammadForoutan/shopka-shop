@@ -28,6 +28,7 @@ const adminRoute = require('./routes/admin');
 
 // Test Database Connection
 const db = require('./configs/database');
+const { isAdmin } = require('./util/user');
 
 try {
     (async () => {
@@ -41,12 +42,13 @@ try {
 // APP
 const app = express();
 
-// intialize flash
-app.use(flash());
-
 // App set
 app.set('view engine', 'ejs');
 app.set('views', 'views');
+
+// Public
+app.use(express.static(path.join(__dirname, 'public')));
+app.use('/images', express.static(path.join(__dirname, 'images')));
 
 // upload
 app.use(upload.single('image'));
@@ -54,12 +56,11 @@ app.use(upload.single('image'));
 // Body-Parser
 app.use(bodyParser.urlencoded({ extended: true }));
 
-// Public
-app.use(express.static(path.join(__dirname, 'public')));
-app.use('/images', express.static(path.join(__dirname, 'images')));
 
-// json
-app.use(express.json());
+
+// intialize flash
+app.use(flash());
+
 // Sessions
 const store = new SequelizeStore({ db, tableName: 'sessions' });
 
@@ -69,21 +70,13 @@ app.use(
         resave: false,
         saveUninitialized: false,
         secret: '12345',
-        store: store,
-        cookie: {
-            // httpOnly: true,
-            // maxAge: 1000 * 60 * 60, // ONE hour
-            // path: '/',
-            // sameSite: true,
-            // secure: true
-        }
+        store: store
     })
 );
 store.sync();
 // csrf
 const csrfProtection = csrf();
 app.use(csrfProtection);
-
 
 
 // USER SETTING
@@ -104,8 +97,8 @@ app.use(async (req, res, next) => {
 app.use((req, res, next) => {
     res.locals.isLoggedIn = req.session.isLoggedIn;
     res.locals.csrfToken = req.csrfToken();
+    res.locals.isAdmin = isAdmin(req);
     res.locals.staticImage = 'http://localhost:3000/';
-    res.locals.ADMIN_ACCESS_LEVEL = 2;
     next();
 });
 

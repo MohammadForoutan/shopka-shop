@@ -3,6 +3,7 @@ const Category = require('../models/category');
 const Product = require('../models/product');
 const User = require('../models/user');
 const Comment = require('../models/comment');
+const MainPage = require('../models/main-page')
 const { validationResult } = require('express-validator');
 
 // util
@@ -480,12 +481,120 @@ exports.postCommentStatus = async (req, res, next) => {
 exports.postDeleteComment = async (req, res, next) => {
     try {
         const { commentId } = req.body;
+        const {product_query} = req.query;
+
         const comment = await Comment.findByPk(commentId);
 
         await comment.destroy();
 
-        res.redirect('/admin/comments');
+        // if delete comment from product-page
+        if(product_query) {
+            return res.redirect('/product/'+ product_query);
+        } else {
+            // if delte comment from comment-page
+            res.redirect('/admin/comments');
+        }
     } catch (error) {
         console.log(error);
     }
 };
+
+exports.getmainPage = async(req, res, next) => {
+    try {
+        const sliders = await MainPage.findAll({where: {type: 'slider'}});
+        const posters = await MainPage.findAll({where: {type: 'poster'}});
+
+        res.status(200).render('admin/main-page', {
+        path: '/admin/main-page',
+        user: req.user,
+        errorMessages: req.flash('errorMessages'),
+        title: 'صفحه اصلی',
+        sliders,
+        posters
+    })
+    } catch (error) {
+        console.log(error);
+    }
+}
+
+exports.postAddSliderImage = async(req, res, next) => {
+    try {
+
+        const {title, link } = req.body;
+        const image = req.file;
+        // No image
+        if(!image) {
+            flashError(req, res, 'لطفا ابتدا یک تصویر انتخاب کنید', '/admin/main-page')
+        }
+
+        MainPage.create({
+            title,
+            link,
+            type: 'slider',
+            image: image.path,
+        })
+
+        res.redirect('/admin/main-page')
+    } catch (error) {
+        console.log(error);
+    }
+}
+
+exports.postDeleteSldierImage = async(req, res, next) => {
+    try {
+        const {sliderId} = req.body;
+
+        
+        const slider = await MainPage.findByPk(sliderId);
+        // delete image from storage
+        if(slider.image) {
+            deleteFile(slider.image)
+        }
+
+        await slider.destroy();
+
+        res.redirect('/admin/main-page')
+    } catch (error) {
+        console.log(error);
+    }
+}
+
+exports.postAddPoster = async(req, res, next) => {
+    try {
+
+        const {title, link } = req.body;
+        const image = req.file;
+        // No image
+        if(!image) {
+            flashError(req, res, 'لطفا ابتدا یک تصویر انتخاب کنید', '/admin/main-page')
+        }
+
+        MainPage.create({
+            title,
+            link,
+            type: 'poster',
+            image: image.path,
+        })
+
+        res.redirect('/admin/main-page');
+    } catch (error) {
+        console.log(error);
+    }
+}
+
+exports.postDeletePosterImage = async(req, res, next) => {
+    try {
+        const {posterId} = req.body;
+        const poster = await MainPage.findByPk(posterId);
+
+        // delete image from storage
+        if(poster.image) {
+            deleteFile(poster.image)
+        }
+        await poster.destroy();
+
+        res.redirect('/admin/main-page')
+    } catch (error) {
+        console.log(error);
+    }
+}

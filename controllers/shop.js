@@ -2,26 +2,29 @@ const Product = require('../models/product');
 const Category = require('../models/category');
 const Comment = require('../models/comment');
 const User = require('../models/user');
+const MainPage = require('../models/main-page');
 const bcrypt = require('bcryptjs');
 
 const PDFDocument = require('pdfkit');
 const { deleteFile } = require('../util/file');
 const { flashError } = require('../util/error');
-const { isAdmin } = require('../util/user');
-
-
 
 const LIMIT_PER_PAGE = 2; // limit per page product in shop-page
 const ALL_ID = 2; // all_id_category
-const PUBLISHED_COMMENT_ID = 2; 
+const PUBLISHED_COMMENT_ID = 2;
 
-exports.getIndex = (req, res, next) => {
+exports.getIndex = async (req, res, next) => {
     try {
+        const sliders = await MainPage.findAll({ where: { type: 'slider' } });
+        const posters = await MainPage.findAll({ where: { type: 'poster' } });
+
         res.status(200).render('shop/index', {
-            path: '/',
+            sliders,
+            posters,
             user: req.user,
             errorMessages: req.flash('errorMessages'),
-            title: 'فروشگاه شوپکا'
+            title: 'فروشگاه شوپکا',
+            path: '/'
         });
     } catch (error) {
         console.log(error);
@@ -92,7 +95,6 @@ exports.getProduct = async (req, res, next) => {
             include: User,
             where: { commentStatusId: PUBLISHED_COMMENT_ID }
         });
-        
 
         res.status(200).render('shop/product', {
             product,
@@ -101,7 +103,6 @@ exports.getProduct = async (req, res, next) => {
             errorMessages: req.flash('errorMessages'),
             path: '/shop',
             title: 'فروشگاه',
-            isAdmin: isAdmin(req),
             comment: null,
             commentEditMode: false
         });
@@ -115,7 +116,7 @@ exports.postAddComment = async (req, res, next) => {
         const { productId, content } = req.body;
         let commentStatusId;
 
-        if (isAdmin(req)) {
+        if (req.isAdmin) {
             commentStatusId = PUBLISHED_COMMENT_ID;
         } else {
             commentStatusId = 1;
@@ -163,7 +164,6 @@ exports.postGetEditComment = async (req, res, next) => {
             title: 'فروشگاه',
             comment,
             commentEditMode: true,
-            isAdmin: isAdmin(req)
         });
     } catch (error) {
         console.log(error);

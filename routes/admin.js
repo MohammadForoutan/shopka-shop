@@ -95,4 +95,20 @@ router.post('/comments/delete', adminController.postDeleteComment);
 // POST => /admin/comment/status
 router.post('/comment/status', adminController.postCommentStatus);
 
+// GET => /admin/main-page
+router.get('/main-page', adminController.getmainPage)
+
+// POST => /admin/slider-image
+router.post('/slider', adminController.postAddSliderImage);
+
+// POST => /admin/slider/delete
+router.post('/slider/delete', adminController.postDeleteSldierImage);
+
+// POST => /admin/poster
+router.post('/poster', adminController.postAddPoster)
+
+// POST => /admin/poster/delete
+router.post('/poster/delete', adminController.postDeletePosterImage)
+
+
 module.exports = router;

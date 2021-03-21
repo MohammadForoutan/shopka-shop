@@ -1,14 +1,8 @@
-const fs = require('fs')
+const fs = require('fs').promises
 const path = require('path')
 const multer = require('multer')
 
 
-// delete file
-const deleteFile = (filePath) => {
-    fs.unlink(filePath, err=> {
-        console.log(err);
-    })
-}
 
 // initialize multer
 // upload
@@ -27,22 +21,30 @@ const fileFilter = (req, file, cb) => {
     // check ext
     const extname = fileTypes.test(
         path.extname(file.originalname).toLowerCase()
-    );
-    // check mime
-    const mimetype = fileTypes.test(file.mimetype);
-
-    if (extname && mimetype) {
-        return cb(null, true);
-    } else {
-        cb('فایل اپلودی باید تصویر باشه');
+        );
+        // check mime
+        const mimetype = fileTypes.test(file.mimetype);
+        
+        if (extname && mimetype) {
+            return cb(null, true);
+        } else {
+            cb('فایل اپلودی باید تصویر باشه');
+        }
+    };
+    
+    const upload = multer({ storage: storage, fileFilter: fileFilter });
+    
+    // delete file
+    const deleteFile = async(filePath) => {
+        try {
+            await fs.unlink(filePath)
+        } catch (error) {
+            console.log(error);
+        }
     }
-};
-
-const upload = multer({ storage: storage, fileFilter: fileFilter });
-
-
-
-module.exports = {
-    deleteFile,
-    upload
+    
+    
+    module.exports = {
+        deleteFile,
+        upload
 }

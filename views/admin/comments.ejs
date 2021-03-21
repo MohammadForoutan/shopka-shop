@@ -11,6 +11,10 @@
         <%- include('../includes/admin-sidebar')%>
         <!-- shop items -->
         <div class="px-1 col-10">
+            <!-- title  -->
+            <div class="alert alert-primary text-center mt-3" role="alert">
+                <h3 style="font-weight: 700;" class="mb-0 py-1">کامنت ها</h3>
+            </div>
             <!-- table of comments -->
             <div class="table table-responsive-md">
                 <table class="table text-center">
@@ -38,7 +42,7 @@
                                     <form action="/admin/comments/delete" method="POST">
                                         <input type="hidden" name="_csrf" value="<%= csrfToken %>">
                                         <input type="hidden" name="commentId" value="<%= comment.id  %>">
-                                        <button class="mx-1 btn-sm btn-info" type="submit">
+                                        <button class="mx-1 btn-sm btn-danger" type="submit">
                                             حذف
                                         </button>
                                     </form>
