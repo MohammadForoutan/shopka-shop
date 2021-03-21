@@ -99,6 +99,7 @@ app.use((req, res, next) => {
     res.locals.csrfToken = req.csrfToken();
     res.locals.isAdmin = isAdmin(req);
     res.locals.staticImage = 'http://localhost:3000/';
+    res.locals.user = req.user;
     next();
 });
 
