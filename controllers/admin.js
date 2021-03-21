@@ -527,7 +527,7 @@ exports.postAddSliderImage = async(req, res, next) => {
             flashError(req, res, 'لطفا ابتدا یک تصویر انتخاب کنید', '/admin/main-page')
         }
 
-        MainPage.create({
+        await MainPage.create({
             title,
             link,
             type: 'slider',
@@ -569,7 +569,7 @@ exports.postAddPoster = async(req, res, next) => {
             flashError(req, res, 'لطفا ابتدا یک تصویر انتخاب کنید', '/admin/main-page')
         }
 
-        MainPage.create({
+        await MainPage.create({
             title,
             link,
             type: 'poster',
