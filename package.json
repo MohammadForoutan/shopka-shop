@@ -23,5 +23,8 @@
     "mysql2": "^2.2.5",
     "pdfkit": "^0.11.0",
     "sequelize": "^6.5.0"
+  },
+  "devDependencies": {
+    "eslint": "^7.22.0"
   }
 }
