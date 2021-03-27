@@ -96,19 +96,24 @@ router.post('/comments/delete', adminController.postDeleteComment);
 router.post('/comment/status', adminController.postCommentStatus);
 
 // GET => /admin/main-page
-router.get('/main-page', adminController.getmainPage)
+router.get('/main-page', adminController.getMainPage)
 
-// POST => /admin/slider-image
-router.post('/slider', adminController.postAddSliderImage);
+// POST => /admin/main-page
+router.post('/main-page', adminController.postAddMainPageView);
 
-// POST => /admin/slider/delete
-router.post('/slider/delete', adminController.postDeleteSldierImage);
+// POST => /admin/main-page/delete
+router.post('/main-page/delete', adminController.postDeleteMainPageView);
 
-// POST => /admin/poster
-router.post('/poster', adminController.postAddPoster)
+// GET => /admin/main-page/edit?viewId=view.id
+router.get('/main-page/edit', adminController.getEditMainPageView)
 
-// POST => /admin/poster/delete
-router.post('/poster/delete', adminController.postDeletePosterImage)
+// POST => /admin/main-page/edit
+router.post('/main-page/edit', adminController.postEditMainPageView)
 
+// POST => /admin/main-page-type
+router.post('/main-page-type', adminController.postAddMainPageType)
+
+// POST => /admin/main-page-type/delete
+router.post('/main-page-type/delete', adminController.postDeleteMainPageType)
 
 module.exports = router;

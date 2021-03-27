@@ -7,6 +7,8 @@ const bodyParser = require('body-parser');
 const flash = require('connect-flash');
 
 const { upload } = require('./util/file');
+const db = require('./configs/database');
+const { isAdmin } = require('./util/user');
 
 
 // Models
@@ -20,6 +22,8 @@ const CartItem = require('./models/cart-item');
 const OrderItem = require('./models/order-item');
 const Order = require('./models/order');
 const CommentStatus = require('./models/comment_status');
+const MainPage = require('./models/main-page');
+const MainPageType = require('./models/main-page-type');
 
 // Routes-path
 const authRoute = require('./routes/auth');
@@ -27,8 +31,6 @@ const shopRoute = require('./routes/shop');
 const adminRoute = require('./routes/admin');
 
 // Test Database Connection
-const db = require('./configs/database');
-const { isAdmin } = require('./util/user');
 
 try {
     (async () => {
@@ -56,7 +58,7 @@ app.use(upload.single('image'));
 // Body-Parser
 app.use(bodyParser.urlencoded({ extended: true }));
 
-
+app.use(express.json());
 
 // intialize flash
 app.use(flash());
@@ -136,6 +138,9 @@ Order.belongsTo(User);
 
 Order.belongsToMany(Product, { through: OrderItem });
 Product.belongsToMany(Order, { through: OrderItem });
+
+MainPageType.hasMany(MainPage);
+MainPage.belongsTo(MainPageType);
 
 // Listener
 db

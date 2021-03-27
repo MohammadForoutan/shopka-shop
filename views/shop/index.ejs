@@ -19,14 +19,96 @@
     <%- include('../includes/navigation')%>
     <%- include('../includes/menu')%>
     <div class="row mx-0">
-        <div class="col-4">
+        <div class="col-4"> 
             <% for(let poster of posters) { %>
-                    <img src="/<%= poster.image %>" alt="<%= poster.title %>" title="<%= poster.title %>">
+                <a href="<%= poster.link %>" class="d-block mb-2">
+                    <img class="img-cover" src="<%= poster.image %>" alt="<%= poster.title %>">
+                </a>
             <% } %>
         </div>
+    
+        <!-- sliders -->
         <div class="col-8">
-            <%- include('../includes/carousel')%>
+            <!-- slider -->
+            <div id="mainSlider" class="carousel slide" data-bs-ride="carousel" >
+                <div class="carousel-indicators">
+                    <!-- if any slide -->
+                    <% let indicator_index = 0; %>
+                    <% for(let slider of sliders) { %>
+                        <button type="button" data-bs-target="#mainSlider" data-bs-slide-to="<%= indicator_index %>" aria-current="<%= indicator_index == 0 ? 'true': ''%>" aria-label="Slide <%=indicator_index %>"></button>
+                        <% indicator_index++ %>
+                    <% } %>
+                </div>
+                <div class="carousel-inner">
+                    
+                    <!-- if any slide -->
+                    <% let slider_index = 0 %>
+                    <% for(let slider of sliders) {  %>
+                            <div class="carousel-item <%= slider_index == 0 ? 'active': ''%>">
+                                <a href="<%= slider.link %>">
+                                    <img height="600" src="<%= slider.image %>" class="d-block w-100 img-cover" alt="<%= slider.title %>" title="<%= slider.title %>">
+                                </a>
+                            </div>
+                        <% slider_index++ %>
+                    <% } %>
+
+
+                    
+                    <!-- if no slider -->
+                    <% if (sliders.length <= 0 ) { %> 
+                        <div class="carousel-item active">
+                            <a href="#">
+                                <img src="/images/slider.png" class="d-block img-cover" alt="slider" title="slider">
+                            </a>
+                        </div>
+                    <% } %>
+                    <button class="carousel-control-prev" type="button" data-bs-target="#mainSlider" data-bs-slide="prev">
+                        <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                        <span class="visually-hidden">Previous</span>
+                    </button>
+                    <button class="carousel-control-next" type="button" data-bs-target="#mainSlider" data-bs-slide="next">
+                        <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                        <span class="visually-hidden">Next</span>
+                    </button>
+                </div>
+            </div>
         </div>
+
+        <!-- banner -->
+        <div class="col-12 row mx-0 mb-3">
+
+            <% for(let banner of banners) { %>
+                <div class="col-3">
+                    <img class="img-cover" src="<%= banner.image%>" alt="<%= banner.title %>">
+                </div>
+            <% } %>
+        </div>
+
+
+        <!-- categories -->
+        <% for(let category of categories) { %>
+            <% if(category.link == "all") continue %>
+            <span class="alert text-white bg-success shadow" style="max-width: 250px;"> <%= category.title %></span>
+            <div class="col-12 row mx-0 my-2">
+                <% for (let product of category.products) { %>%>
+                    <div class="card col-2 border-0 rounded-0 small">
+                        <img src="/<%= product.image  %>" class="card-img-top img-cover" alt="<%= product.title %>">
+                        <div class="card-body">
+                          <h6 class="card-title small"> <%= product.title %></h6>
+                          <h6 class="small p-0 py-0"> <%= product.price %> تومان</h6>
+                          <!-- <p class="card-text small"><%= product.description %></p> -->
+                          <div class="row align-items-center shadow-sm rounded">
+                              <a href="/product/<%= product.id %>" class="p-1 col text-center btn btn-primary">بررسی</a>
+                              <div class="col-6">
+                                  <%- include('../includes/add-to-cart', {product})%>
+                              </div>
+                          </div>
+                        </div>
+                    </div>
+                <% } %>
+            </div>
+        <% } %>
+        
     </div>
 
 

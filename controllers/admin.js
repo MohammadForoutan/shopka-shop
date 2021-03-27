@@ -4,9 +4,10 @@ const Product = require('../models/product');
 const User = require('../models/user');
 const Comment = require('../models/comment');
 const MainPage = require('../models/main-page');
-const { validationResult } = require('express-validator');
+const MainPageType = require('../models/main-page-type');
 
 // util
+const { validationResult } = require('express-validator');
 const { deleteFile } = require('../util/file');
 const { flashError } = require('../util/error');
 
@@ -168,8 +169,6 @@ exports.postEditProduct = async (req, res, next) => {
             productId,
             attributes
         } = req.body;
-
-        console.log(productId);
 
         // express validator
         const errors = validationResult(req);
@@ -387,14 +386,13 @@ exports.getUsers = async (req, res, next) => {
 exports.postUpdateUsers = async (req, res, next) => {
     try {
         const { userId, accessLevelId, email, name } = req.body;
-        
+
         const user = await User.findByPk(userId);
         // update user
         user.accessLevelId = accessLevelId;
         user.email = email;
         user.name = name;
 
-        
         await user.save();
 
         res.redirect('/admin/users');
@@ -424,7 +422,7 @@ exports.getEditUsers = async (req, res, next) => {
                 title: 'کاربران',
                 errorMessages: req.flash('errorMessages'),
                 editMode: true,
-                users,
+                users
             });
         }
     } catch (error) {
@@ -476,7 +474,7 @@ exports.postDeleteComment = async (req, res, next) => {
         // if delete comment from product-page
         if (product_query) {
             return res.redirect('/product/' + product_query);
-        } 
+        }
         // if delte comment from comment-page
         else {
             res.redirect('/admin/comments');
@@ -486,26 +484,81 @@ exports.postDeleteComment = async (req, res, next) => {
     }
 };
 
-exports.getmainPage = async (req, res, next) => {
+exports.getMainPage = async (req, res, next) => {
     try {
-        const sliders = await MainPage.findAll({ where: { type: 'slider' } });
-        const posters = await MainPage.findAll({ where: { type: 'poster' } });
+        const views = await MainPage.findAll({ include: MainPageType });
+        const viewTypes = await MainPageType.findAll();
 
+        const editMode = false;
+
+        // return res.json({views})
         res.status(200).render('admin/main-page', {
             path: '/admin/main-page',
             title: 'صفحه اصلی',
             errorMessages: req.flash('errorMessages'),
-            sliders,
-            posters
+            views,
+            viewTypes,
+            editMode
         });
     } catch (error) {
         console.log(error);
     }
 };
 
-exports.postAddSliderImage = async (req, res, next) => {
+exports.getEditMainPageView = async (req, res, next) => {
     try {
-        const { title, link } = req.body;
+        const views = [];
+        const viewTypes = await MainPageType.findAll();
+
+        const { viewId } = req.query;
+        const view = await MainPage.findByPk(viewId);
+
+        const editMode = true;
+
+        res.status(200).render('admin/main-page', {
+            path: '/admin/main-page',
+            title: 'صفحه اصلی',
+            errorMessages: req.flash('errorMessages'),
+            views,
+            viewTypes,
+            editMode,
+            view
+        });
+    } catch (error) {
+        console.log(error);
+    }
+};
+
+exports.postEditMainPageView = async (req, res, next) => {
+    try {
+        const { title, link, typeId, viewId } = req.body;
+
+
+
+        let image = req.file;
+        // find product
+        let view = await MainPage.findByPk(viewId);
+        //  if new image --- delete old image
+        if (image) {
+            deleteFile(view.image);
+            image = image.path;
+            view.image = image;
+        }
+
+        view.title = title;
+        view.link = link;
+        view.mainPageTypeId = typeId
+
+        await view.save();
+        res.redirect('/admin/main-page');
+    } catch (error) {
+        console.log(error);
+    }
+};
+
+exports.postAddMainPageView = async (req, res, next) => {
+    try {
+        const { title, link, typeId } = req.body;
         const image = req.file;
         // No image
         if (!image) {
@@ -520,8 +573,8 @@ exports.postAddSliderImage = async (req, res, next) => {
         await MainPage.create({
             title,
             link,
-            type: 'slider',
-            image: image.path
+            image: image.path,
+            mainPageTypeId: typeId
         });
 
         res.redirect('/admin/main-page');
@@ -530,17 +583,16 @@ exports.postAddSliderImage = async (req, res, next) => {
     }
 };
 
-exports.postDeleteSldierImage = async (req, res, next) => {
+exports.postDeleteMainPageView = async (req, res, next) => {
     try {
-        const { sliderId } = req.body;
-
-        const slider = await MainPage.findByPk(sliderId);
+        const { viewId } = req.body;
+        const mainPage = await MainPage.findByPk(viewId);
         // delete image from storage
-        if (slider.image) {
-            deleteFile(slider.image);
+        if (mainPage.image) {
+            deleteFile(mainPage.image);
         }
 
-        await slider.destroy();
+        await mainPage.destroy();
 
         res.redirect('/admin/main-page');
     } catch (error) {
@@ -548,25 +600,15 @@ exports.postDeleteSldierImage = async (req, res, next) => {
     }
 };
 
-exports.postAddPoster = async (req, res, next) => {
+// exports
+
+exports.postAddMainPageType = async (req, res, next) => {
     try {
         const { title, link } = req.body;
-        const image = req.file;
-        // if No image
-        if (!image) {
-            flashError(
-                req,
-                res,
-                'لطفا ابتدا یک تصویر انتخاب کنید',
-                '/admin/main-page'
-            );
-        }
 
-        await MainPage.create({
+        await MainPageType.create({
             title,
-            link,
-            type: 'poster',
-            image: image.path
+            link
         });
 
         res.redirect('/admin/main-page');
@@ -575,16 +617,12 @@ exports.postAddPoster = async (req, res, next) => {
     }
 };
 
-exports.postDeletePosterImage = async (req, res, next) => {
+exports.postDeleteMainPageType = async (req, res, next) => {
     try {
-        const { posterId } = req.body;
-        const poster = await MainPage.findByPk(posterId);
+        const { typeId } = req.body;
+        const type = await MainPageType.findByPk(typeId);
 
-        // delete image from storage
-        if (poster.image) {
-            deleteFile(poster.image);
-        }
-        await poster.destroy();
+        await type.destroy();
 
         res.redirect('/admin/main-page');
     } catch (error) {

@@ -19,10 +19,8 @@ const MainPage = db.define('mainPage', {
         allowNull: false
     },
     link: {
-        type: DataTypes.STRING
-    },
-    type: {
-        type: DataTypes.STRING
+        type: DataTypes.STRING,
+        allowNull: false
     }
 })
 

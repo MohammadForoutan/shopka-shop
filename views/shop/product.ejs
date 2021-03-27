@@ -113,6 +113,25 @@
             </div>
         </div>
 
+        <hr>
+
+        <!-- related products -->
+        <div class="row">
+            <h4 class="col-12 alert alert-info">محصولات مرتبط</h4>
+            <% for(let relatedProduct of relatedProducts) { %>  
+                <div class="card col-2 border-0 rounded-0 small">
+                    <img src="/<%= relatedProduct.image  %>" class="card-img-top img-cover" alt="<%= relatedProduct.title %>">
+                    <div class="card-body">
+                        <h6 class="card-title small"> <%= relatedProduct.title %></h6>
+                        <h6 class="small p-0 py-0"> <%= relatedProduct.price %> تومان</h6>
+                        <a href="/relatedProduct/<%= relatedProduct.id %>" class="btn btn-primary btn-sm">بررسی</a>
+                    </div>
+                </div>
+            <% } %>
+
+        </div>
+
+
         <br>
         <br>
     </div>

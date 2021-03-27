@@ -25,123 +25,85 @@
                 <% } %>
             <% } %>
     
-            <!-- title  -->
+            <!-- title of page -->
             <div class="alert alert-primary text-center mt-3" role="alert">
                 <h3 style="font-weight: 700;" class="mb-0 py-1">صفحه اصلی</h3>
             </div>
-            <!-- images -->
-            <div>
-                <!-- tab link -->
-                <nav>
-                    <div class="nav nav-tabs" id="nav-tab" role="tablist">
-                        <button class="nav-link active" id="nav-slider-tab" data-bs-toggle="tab" data-bs-target="#nav-slider" type="button" role="tab" aria-controls="nav-slider" aria-selected="true">اسلایدر</button>
-                        <button class="nav-link" id="nav-poster-tab" data-bs-toggle="tab" data-bs-target="#nav-poster" type="button" role="tab" aria-controls="nav-poster" aria-selected="false">پوستر</button>
-                    </div>
-                </nav>
-                <!-- tab content -->
-                <div class="tab-content" id="nav-tabContent">
-                    <!-- slider tab -->
-                    <div class="tab-pane fade show active" id="nav-slider" role="tabpanel" aria-labelledby="nav-slider-tab">
-                        <div class="row">
-                            <!-- form slider upload -->
-                            <form class="col-6" action="/admin/slider" method="POST" enctype="multipart/form-data">
-                                
-                                    <h5 for="image" class="d-block py-3 bg-info text-center">تصویر اسلایدر</h5>
-                                    <div>
-                                        <label for="title">عنوان</label>
-                                        <input type="text" name="title" id="title">
-                                    </div>
-    
-                                    <br>
-    
-                                    <div>
-                                        <label for="link">لینک</label>
-                                        <input type="text" name="link" id="link">
-                                    </div>
-    
-                                    <br>
-                                    <!-- csrfToken -->
-                                    <input type="hidden" name="_csrf" value="<%= csrfToken %>">
-    
-                                    <div>
-                                        <label for="image">تصویر</label>
-                                        <input class="btn btn-primary" type="file" name="image" id="image">
-                                    </div>
-    
-                                    <br>
-    
-                                    <button class="btn btn-warning" type="submit">ثبت</button>
-    
-                            </form>
-                            
-                            <!-- preview sliders -->
-                            <div class="col-6 row mx-0">
-                                <h5 style="height: 60px;" class="d-block py-3 bg-info text-center"> اسلایدرها</h5>
-                                <% for(let slider of sliders) { %>
-                                    <div class="col-6">
-                                        <img class="w-100" src="/<%= slider.image %>" alt="<%= slider.title %>">
-                                        <!-- delete button -->
-                                        <form action="/admin/slider/delete" method="POST">
-                                            <input type="hidden" name="_csrf" value="<%= csrfToken %>">
-                                            <input type="hidden" name="sliderId" value="<%= slider.id %>">
-                                            <button class="btn btn-sm btn-danger p-0 px-1">حذف</button>
-                                        </form>
-                                    </div>
+
+              <!-- add -->
+                <div class="row">
+                    
+                    <form class="col" action="<%= editMode ? '/admin/main-page/edit': '/admin/main-page'%>" method="POST" enctype="multipart/form-data">
+                        <h5 class="text-center alert alert-info">افزودن بخش</h5>
+                        <!-- type -->
+                        <div>
+                            <label for="type">نوع</label>
+                            <select name="typeId" id="type">
+                                <% for(let type of viewTypes) { %>
+                                    <option value="<%= type.id  %>"><%= type.title %></option>                                    
                                 <% } %>
-                            </div>
+                            </select>
                         </div>
-                    </div>
-                    <!-- poster tab -->
-                    <div class="tab-pane fade" id="nav-poster" role="tabpanel" aria-labelledby="nav-poster-tab">
-                        <div class="row">
-                            <!-- poster upload -->
-                            <form class="col-6" action="/admin/poster" method="POST" enctype="multipart/form-data">
-                                    <h5 for="image" class="d-block py-3 bg-info text-center">تصویر پوستر</h5>
-                                    <div>
-                                        <label for="title">عنوان</label>
-                                        <input type="text" name="title" id="title">
-                                    </div>
-    
-                                    <br>
-    
-                                    <div>
-                                        <label for="link">لینک</label>
-                                        <input type="text" name="link" id="link">
-                                    </div>
-    
-                                    <br>
-    
-                                    <div>
-                                        <label for="image">تصویر</label>
-                                        <input class="btn btn-primary" type="file" name="image" id="image">
-                                    </div>
-    
-                                    <br>
-    
-                                    <input type="hidden" name="_csrf" value="<%= csrfToken %>">
-                                    <button class="btn btn-warning" type="submit">ثبت</button>
-                                </form>
-    
-                                <!-- preview posers -->
-                                <div class="col-6 row mx-0">
-                                    <h5 style="height: 60px;"  class="py-3 bg-info text-center"> پوسترها</h5>
-                                    <% for(let poster of posters) { %>
-                                        <div class="col-6">
-                                            <img class="w-100" src="/<%= poster.image %>" alt="<%= poster.title %>">
-                                            <!-- delete button -->
-                                            <form action="/admin/poster/delete" method="POST">
-                                                <input type="hidden" name="_csrf" value="<%= csrfToken %>">
-                                                <input type="hidden" name="posterId" value="<%= poster.id %>">
-                                                <button class="btn btn-sm btn-danger p-0 px-1">حذف</button>
-                                            </form>
-                                        </div>
-                                    <% } %>
-                                </div>
+
+                        <br>
+
+                        <!-- title -->
+                        <div>
+                            <label for="title">عنوان</label>
+                            <input type="text" name="title" placeholder="عنوان" value="<%= editMode ? view.title: ''%>">
                         </div>
+
+                        <br>
+
+                        <!-- link -->
+                        <div>
+                            <label for="link">لینک</label>
+                            <input type="text" name="link" placeholder="لینک" value="<%= editMode ? view.link: ''%>">
+                        </div>
+
+                        <br>
+
+                        <!-- image -->
+                        <div>
+                            <label for="image">تصویر</label>
+                            <input type="file" name="image" placeholder="تصویر">
+                        </div>
+
+                        <br>
+
+                        <% if(editMode) { %>
+                            <input type="hidden" name="viewId" value="<%= view.id %>">
+                        <% } %>
+                        <input type="hidden" name="_csrf" value="<%= csrfToken%>">
+                        <button class="btn btn-primary" type="submit">اضافه کردن</button>
+                    </form>
+
+                    <div class="col">
+                        <h5 class="alert alert-info text-center">
+                            بخش ها
+                        </h5>
+                        <ul class="row list-unstyled">
+                            <% for(let view of views) { %>
+                                <li class="col-6 mb-2">
+                                    <img class="d-block w-100" src="/<%= view.image  %>" alt="<%= view.title  %>">
+                                    <%= view.title  %> ((<%= view.mainPageType.title  %>))
+                                    <!-- delete form -->
+                                    <form action="/admin/main-page/delete" method="POST" class="d-inline-block">
+                                        <input type="hidden" name="viewId" value="<%= view.id %>">
+                                        <input type="hidden" name="_csrf" value="<%= csrfToken%>">
+                                        <button class="btn-sm btn btn-danger p-0 px-1 mt-2">حذف</button>
+                                    </form>
+                                    <!-- edit form -->
+                                    <a href="/admin/main-page/edit?viewId=<%= view.id %>" class="btn btn-info p-0 px-1 btn-sm">ویرایش</a>
+                                </li>
+                            <% } %>
+                        </ul>
                     </div>
-                </div>                  
-            </div>
+                </div>
+
+                <br>
+
+                
         </div>
     </div>
-
     <%- include('../includes/end')%>

@@ -24,3 +24,7 @@ textarea {
     transition: 1s;
 }
 
+.img-cover {
+    width: 100%;
+    object-fit: cover;
+}

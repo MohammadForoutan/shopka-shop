@@ -8,6 +8,7 @@ const bcrypt = require('bcryptjs');
 const PDFDocument = require('pdfkit');
 const { deleteFile } = require('../util/file');
 const { flashError } = require('../util/error');
+const MainPageType = require('../models/main-page-type');
 
 const LIMIT_PER_PAGE = 2; // limit per page product in shop-page
 const ALL_ID = 2; // all_id_category
@@ -15,13 +16,38 @@ const PUBLISHED_COMMENT_ID = 2;
 
 exports.getIndex = async (req, res, next) => {
     try {
-        const sliders = await MainPage.findAll({ where: { type: 'slider' } });
-        const posters = await MainPage.findAll({ where: { type: 'poster' } });
+        const posters = await MainPage.findAll({
+            include: {
+                model: MainPageType,
+                where: { link: 'poster' }
+            },
+            limit: 2
+        });
+
+        const sliders = await MainPage.findAll({
+            include: {
+                model: MainPageType,
+                where: { link: 'slider' }
+            }
+        });
+
+        const banners = await MainPage.findAll({
+            include: {
+                model: MainPageType,
+                where: { link: 'category_banner' }
+            },
+            limit: 4
+        });
+
+        const categories = await Category.findAll({limit: 4, include: {model: Product, limit: 8}});
+
+        // return res.json({categories});
 
         res.status(200).render('shop/index', {
-            sliders,
             posters,
-            user: req.user,
+            sliders,
+            banners,
+            categories,
             errorMessages: req.flash('errorMessages'),
             title: 'فروشگاه شوپکا',
             path: '/'
@@ -86,10 +112,15 @@ exports.getProduct = async (req, res, next) => {
         const { productId } = req.params;
         const product = await Product.findByPk(productId);
 
+        
         if (!product) {
             flashError(req, res, 'چنین محصولی وجود ندارد.', '/shop');
         }
-
+        
+        const relatedProducts = await Product.findAll({
+            where: {'categoryId': product.categoryId},
+            limit: 10
+        })
         // comments
         const comments = await product.getComments({
             include: User,
@@ -97,9 +128,9 @@ exports.getProduct = async (req, res, next) => {
         });
 
         res.status(200).render('shop/product', {
+            relatedProducts,
             product,
             comments,
-            user: req.user,
             errorMessages: req.flash('errorMessages'),
             path: '/shop',
             title: 'فروشگاه',
@@ -163,7 +194,7 @@ exports.postGetEditComment = async (req, res, next) => {
             path: '/shop',
             title: 'فروشگاه',
             comment,
-            commentEditMode: true,
+            commentEditMode: true
         });
     } catch (error) {
         console.log(error);
