@@ -10,6 +10,9 @@ const isAuth = require('../middleware/is-auth');
 // GET => /
 router.get('/', shopController.getIndex);
 
+// POST => /search
+router.post('/search', shopController.postSearch)
+
 // GET => /shop
 router.get('/shop', shopController.getShop);
 

@@ -3,12 +3,13 @@ const Category = require('../models/category');
 const Comment = require('../models/comment');
 const User = require('../models/user');
 const MainPage = require('../models/main-page');
-const bcrypt = require('bcryptjs');
+const MainPageType = require('../models/main-page-type');
 
+const { Op } = require('sequelize');
+const bcrypt = require('bcryptjs');
 const PDFDocument = require('pdfkit');
 const { deleteFile } = require('../util/file');
 const { flashError } = require('../util/error');
-const MainPageType = require('../models/main-page-type');
 
 const LIMIT_PER_PAGE = 2; // limit per page product in shop-page
 const ALL_ID = 2; // all_id_category
@@ -39,7 +40,10 @@ exports.getIndex = async (req, res, next) => {
             limit: 4
         });
 
-        const categories = await Category.findAll({limit: 4, include: {model: Product, limit: 8}});
+        const categories = await Category.findAll({
+            limit: 4,
+            include: { model: Product, limit: 8 }
+        });
 
         // return res.json({categories});
 
@@ -51,6 +55,33 @@ exports.getIndex = async (req, res, next) => {
             errorMessages: req.flash('errorMessages'),
             title: 'فروشگاه شوپکا',
             path: '/'
+        });
+    } catch (error) {
+        console.log(error);
+    }
+};
+
+exports.postSearch = async (req, res, next) => {
+    try {
+        const { search } = req.body;
+
+        const results = await Product.findAll({
+            where: {
+                title: {
+                    [Op.like]: `%${search}%`
+                }
+            },
+            limit: 10
+        });
+
+        const categories = await Category.findAll();
+
+        res.status(200).render('shop/search-result', {
+            path: '/shop',
+            title: `نتایج برای "${search}"`,
+            errorMessages: req.flash('errorMessages'),
+            results,
+            categories
         });
     } catch (error) {
         console.log(error);
@@ -95,7 +126,6 @@ exports.getShop = async (req, res, next) => {
             categoryId,
             products,
             path: '/shop',
-            user: req.user,
             errorMessages: req.flash('errorMessages'),
             categories,
             title: 'فروشگاه',
@@ -112,15 +142,14 @@ exports.getProduct = async (req, res, next) => {
         const { productId } = req.params;
         const product = await Product.findByPk(productId);
 
-        
         if (!product) {
             flashError(req, res, 'چنین محصولی وجود ندارد.', '/shop');
         }
-        
+
         const relatedProducts = await Product.findAll({
-            where: {'categoryId': product.categoryId},
+            where: { categoryId: product.categoryId },
             limit: 10
-        })
+        });
         // comments
         const comments = await product.getComments({
             include: User,
