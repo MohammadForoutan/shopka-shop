@@ -1,8 +1,8 @@
 const flashError = (request, result, message, redirectAddress) => {
     request.flash('errorMessages', [message]);
 
-    request.session.save((err) => {
-        console.log(err);
+    request.session.save((error) => {
+        console.log(error);
         return result.redirect(redirectAddress);
     });
 };

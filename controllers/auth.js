@@ -23,9 +23,9 @@ exports.getLogin = async (req, res, next) => {
             title: 'ورود به حساب'
         });
     } catch (error) {
-        const error = new Error(error);
-        error.httpStatusCode = 500;
-        return next(error);
+        const err = new Error(error);
+        err.httpStatusCode = 500;
+        return next(err);
     }
 };
 
@@ -84,9 +84,9 @@ exports.postLogin = async (req, res, next) => {
             });
         }
     } catch (error) {
-        const error = new Error(error);
-        error.httpStatusCode = 500;
-        return next(error);
+        const err = new Error(error);
+        err.httpStatusCode = 500;
+        return next(err);
     }
 };
 
@@ -106,9 +106,9 @@ exports.getSignup = async (req, res, next) => {
             title: 'ساخت حساب'
         });
     } catch (error) {
-        const error = new Error(error);
-        error.httpStatusCode = 500;
-        return next(error);
+        const err = new Error(error);
+        err.httpStatusCode = 500;
+        return next(err);
     }
 };
 
@@ -165,9 +165,9 @@ exports.postSignup = async (req, res, next) => {
         const cart = await user.createCart();
         res.redirect('/auth/login');
     } catch (error) {
-        const error = new Error(error);
-        error.httpStatusCode = 500;
-        return next(error);
+        const err = new Error(error);
+        err.httpStatusCode = 500;
+        return next(err);
     }
 };
 
@@ -180,9 +180,9 @@ exports.getResetPassword = async (req, res, next) => {
             title: 'فراموشی رمز'
         });
     } catch (error) {
-        const error = new Error(error);
-        error.httpStatusCode = 500;
-        return next(error);
+        const err = new Error(error);
+        err.httpStatusCode = 500;
+        return next(err);
     }
 };
 
@@ -195,10 +195,10 @@ exports.postResetPassword = async (req, res, next) => {
             flashError(req, res, 'کاربری با این ایمیل یافت نشد', '/auth/reset');
         }
         // crypto
-        crypto.randomBytes(32, async (err, buffer) => {
-            if (err) {
+        crypto.randomBytes(32, async (error, buffer) => {
+            if (error) {
                 // log error
-                console.log(err);
+                console.log(error);
                 flashError(req, res, 'دوباره تلاش کنید.', '/auth/reset');
             }
             // generate token
@@ -211,9 +211,9 @@ exports.postResetPassword = async (req, res, next) => {
             flashError(req, res, 'ایمیل ارسال شد.', '/auth/reset');
         }); // end crypto
     } catch (error) {
-        const error = new Error(error);
-        error.httpStatusCode = 500;
-        return next(error);
+        const err = new Error(error);
+        err.httpStatusCode = 500;
+        return next(err);
     }
 };
 
@@ -233,9 +233,9 @@ exports.getNewPassword = async (req, res, next) => {
             title: 'رمز جدید'
         });
     } catch (error) {
-        const error = new Error(error);
-        error.httpStatusCode = 500;
-        return next(error);
+        const err = new Error(error);
+        err.httpStatusCode = 500;
+        return next(err);
     }
 };
 
@@ -256,9 +256,9 @@ exports.postNewPassword = async (req, res, next) => {
 
         res.redirect('/auth/login');
     } catch (error) {
-        const error = new Error(error);
-        error.httpStatusCode = 500;
-        return next(error);
+        const err = new Error(error);
+        err.httpStatusCode = 500;
+        return next(err);
     }
 };
 
@@ -269,8 +269,8 @@ exports.postLogout = async (req, res, next) => {
             res.redirect('/');
         });
     } catch (error) {
-        const error = new Error(error);
-        error.httpStatusCode = 500;
-        return next(error);
+        const err = new Error(error);
+        err.httpStatusCode = 500;
+        return next(err);
     }
 };

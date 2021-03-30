@@ -5,9 +5,9 @@ exports.get404 = async(req, res, next) => {
             path: '/404'
         })
     } catch (error) {
-        const error = new Error(error);
-        error.httpStatusCode = 500;
-        return next(error);
+        const err = new Error(error);
+        err.httpStatusCode = 500;
+        return next(err);
     }
 }
 
@@ -18,8 +18,8 @@ exports.get500 = async(req, res, next) => {
             path: '/500'
         })
     } catch (error) {
-        const error = new Error(error);
-        error.httpStatusCode = 500;
-        return next(error);
+        const err = new Error(error);
+        err.httpStatusCode = 500;
+        return next(err);
     }
 }

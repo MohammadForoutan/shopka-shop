@@ -39,9 +39,9 @@ try {
     })();
 } catch (error) {
     console.log('Unable to connect to database: ==> ');
-    const error = new Error(error);
-    error.httpStatusCode = 500;
-    return next(error);
+    const err = new Error(error);
+    err.httpStatusCode = 500;
+    return next(err);
 }
 
 // APP
@@ -98,9 +98,9 @@ app.use(async (req, res, next) => {
         req.user = user;
         next();
     } catch (error) {
-        const error = new Error(error);
-        error.httpStatusCode = 500;
-        return next(error);
+        const err = new Error(error);
+        err.httpStatusCode = 500;
+        return next(err);
     }
 });
 
@@ -170,7 +170,7 @@ db
             );
         });
     }).catch(error => {
-        const error = new Error(error);
-        error.httpStatusCode = 500;
-        return next(error);
+        const err = new Error(error);
+        err.httpStatusCode = 500;
+        return next(err);
     })

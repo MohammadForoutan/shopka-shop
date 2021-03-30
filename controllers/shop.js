@@ -57,9 +57,9 @@ exports.getIndex = async (req, res, next) => {
             path: '/'
         });
     } catch (error) {
-        const error = new Error(error);
-        error.httpStatusCode = 500;
-        return next(error);
+        const err = new Error(error);
+        err.httpStatusCode = 500;
+        return next(err);
     }
 };
 
@@ -86,9 +86,9 @@ exports.postSearch = async (req, res, next) => {
             categories
         });
     } catch (error) {
-        const error = new Error(error);
-        error.httpStatusCode = 500;
-        return next(error);
+        const err = new Error(error);
+        err.httpStatusCode = 500;
+        return next(err);
     }
 };
 
@@ -137,9 +137,9 @@ exports.getShop = async (req, res, next) => {
             page
         });
     } catch (error) {
-        const error = new Error(error);
-        error.httpStatusCode = 500;
-        return next(error);
+        const err = new Error(error);
+        err.httpStatusCode = 500;
+        return next(err);
     }
 };
 
@@ -173,9 +173,9 @@ exports.getProduct = async (req, res, next) => {
             commentEditMode: false
         });
     } catch (error) {
-        const error = new Error(error);
-        error.httpStatusCode = 500;
-        return next(error);
+        const err = new Error(error);
+        err.httpStatusCode = 500;
+        return next(err);
     }
 };
 
@@ -199,9 +199,9 @@ exports.postAddComment = async (req, res, next) => {
         });
         res.redirect('/product/' + productId);
     } catch (error) {
-        const error = new Error(error);
-        error.httpStatusCode = 500;
-        return next(error);
+        const err = new Error(error);
+        err.httpStatusCode = 500;
+        return next(err);
     }
 };
 
@@ -236,9 +236,9 @@ exports.postGetEditComment = async (req, res, next) => {
             commentEditMode: true
         });
     } catch (error) {
-        const error = new Error(error);
-        error.httpStatusCode = 500;
-        return next(error);
+        const err = new Error(error);
+        err.httpStatusCode = 500;
+        return next(err);
     }
 };
 
@@ -264,9 +264,9 @@ exports.postPostEditComment = async (req, res, next) => {
         await comment.save();
         res.redirect(`/product/${productId}`);
     } catch (error) {
-        const error = new Error(error);
-        error.httpStatusCode = 500;
-        return next(error);
+        const err = new Error(error);
+        err.httpStatusCode = 500;
+        return next(err);
     }
 };
 
@@ -280,9 +280,9 @@ exports.getProfile = async (req, res, next) => {
             title: 'پروفایل کاربر'
         });
     } catch (error) {
-        const error = new Error(error);
-        error.httpStatusCode = 500;
-        return next(error);
+        const err = new Error(error);
+        err.httpStatusCode = 500;
+        return next(err);
     }
 };
 
@@ -303,9 +303,9 @@ exports.postGetEditProfile = async (req, res, next) => {
             title: 'پروفایل کاربر'
         });
     } catch (error) {
-        const error = new Error(error);
-        error.httpStatusCode = 500;
-        return next(error);
+        const err = new Error(error);
+        err.httpStatusCode = 500;
+        return next(err);
     }
 };
 
@@ -335,9 +335,9 @@ exports.postPostEditProfile = async (req, res, next) => {
 
         res.redirect('/profile');
     } catch (error) {
-        const error = new Error(error);
-        error.httpStatusCode = 500;
-        return next(error);
+        const err = new Error(error);
+        err.httpStatusCode = 500;
+        return next(err);
     }
 };
 
@@ -356,9 +356,9 @@ exports.postProfileAvatar = async (req, res, next) => {
 
         res.redirect('/profile');
     } catch (error) {
-        const error = new Error(error);
-        error.httpStatusCode = 500;
-        return next(error);
+        const err = new Error(error);
+        err.httpStatusCode = 500;
+        return next(err);
     }
 };
 
@@ -375,9 +375,9 @@ exports.getCart = async (req, res, next) => {
             });
         }
     } catch (error) {
-        const error = new Error(error);
-        error.httpStatusCode = 500;
-        return next(error);
+        const err = new Error(error);
+        err.httpStatusCode = 500;
+        return next(err);
     }
 };
 
@@ -405,9 +405,9 @@ exports.postCart = async (req, res, next) => {
 
         res.redirect('/cart');
     } catch (error) {
-        const error = new Error(error);
-        error.httpStatusCode = 500;
-        return next(error);
+        const err = new Error(error);
+        err.httpStatusCode = 500;
+        return next(err);
     }
 };
 
@@ -420,9 +420,9 @@ exports.postDeleteCart = async (req, res, next) => {
         await product.cartItem.destroy();
         res.redirect('/cart');
     } catch (error) {
-        const error = new Error(error);
-        error.httpStatusCode = 500;
-        return next(error);
+        const err = new Error(error);
+        err.httpStatusCode = 500;
+        return next(err);
     }
 };
 
@@ -440,9 +440,9 @@ exports.getOrder = async (req, res, next) => {
             });
         }
     } catch (error) {
-        const error = new Error(error);
-        error.httpStatusCode = 500;
-        return next(error);
+        const err = new Error(error);
+        err.httpStatusCode = 500;
+        return next(err);
     }
 };
 
@@ -472,9 +472,9 @@ exports.postOrder = async (req, res, next) => {
 
         res.redirect('/order');
     } catch (error) {
-        const error = new Error(error);
-        error.httpStatusCode = 500;
-        return next(error);
+        const err = new Error(error);
+        err.httpStatusCode = 500;
+        return next(err);
     }
 };
 
@@ -534,8 +534,8 @@ exports.getInvoice = async (req, res, next) => {
         // end pdf
         pdfDoc.end();
     } catch (error) {
-        const error = new Error(error);
-        error.httpStatusCode = 500;
-        return next(error);
+        const err = new Error(error);
+        err.httpStatusCode = 500;
+        return next(err);
     }
 };
