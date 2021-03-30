@@ -10,7 +10,6 @@ const { upload } = require('./util/file');
 const db = require('./configs/database');
 const { isAdmin } = require('./util/user');
 
-
 // Models
 const Comment = require('./models/comment');
 const User = require('./models/user');
@@ -29,6 +28,7 @@ const MainPageType = require('./models/main-page-type');
 const authRoute = require('./routes/auth');
 const shopRoute = require('./routes/shop');
 const adminRoute = require('./routes/admin');
+const errorController = require('./controllers/error');
 
 // Test Database Connection
 
@@ -38,7 +38,10 @@ try {
         console.log('CONNECTION HAS BEEN ESTABLISHED SUCCESSFULLY.');
     })();
 } catch (error) {
-    console.log('Unable to connect to database: ==> ', error);
+    console.log('Unable to connect to database: ==> ');
+    const error = new Error(error);
+    error.httpStatusCode = 500;
+    return next(error);
 }
 
 // APP
@@ -80,7 +83,6 @@ store.sync();
 const csrfProtection = csrf();
 app.use(csrfProtection);
 
-
 // USER SETTING
 app.use(async (req, res, next) => {
     try {
@@ -89,10 +91,16 @@ app.use(async (req, res, next) => {
             return next();
         }
         const user = await User.findByPk(req.session.user.id);
+        // if no user
+        if (!user) {
+            return next();
+        }
         req.user = user;
         next();
     } catch (error) {
-        console.log(error);
+        const error = new Error(error);
+        error.httpStatusCode = 500;
+        return next(error);
     }
 });
 
@@ -110,6 +118,14 @@ app.use(shopRoute);
 app.use('/admin', adminRoute);
 app.use('/auth', authRoute);
 
+app.use(errorController.get404);
+
+app.use((error, req, res, next) => {
+    res.status(500).render('errors/500', {
+        title: 'صفحه پیدا نشد.',
+        path: '/500'
+    })
+});
 // DATABASE‌ ASSOCIATION
 
 AccessLevel.hasMany(User, { constraints: true });
@@ -153,4 +169,8 @@ db
                 '####################################\n    =======> CONNECTED <========\n####################################'
             );
         });
-    });
+    }).catch(error => {
+        const error = new Error(error);
+        error.httpStatusCode = 500;
+        return next(error);
+    })

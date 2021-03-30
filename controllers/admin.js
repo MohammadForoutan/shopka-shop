@@ -16,10 +16,16 @@ const UNCATEGORIZED_CATEGORY_ID = 2;
 const ADMIN_USER_ID = 1;
 
 exports.getAdmin = (req, res, next) => {
-    res.status(200).render('admin/dashboard', {
-        path: '/admin',
-        title: 'داشبورد'
-    });
+    try {
+        res.status(200).render('admin/dashboard', {
+            path: '/admin',
+            title: 'داشبورد'
+        });
+    } catch (error) {
+        const error = new Error(error);
+        error.httpStatusCode = 500;
+        return next(error);
+    }
 };
 
 exports.getProducts = async (req, res, next) => {
@@ -48,7 +54,9 @@ exports.getProducts = async (req, res, next) => {
             categories
         });
     } catch (error) {
-        console.log(error);
+        const error = new Error(error);
+        error.httpStatusCode = 500;
+        return next(error);
     }
 };
 
@@ -106,7 +114,9 @@ exports.postAddProduct = async (req, res, next) => {
         });
         res.redirect('/admin/products');
     } catch (error) {
-        console.log(error);
+        const error = new Error(error);
+        error.httpStatusCode = 500;
+        return next(error);
     }
 };
 
@@ -120,7 +130,9 @@ exports.postDeleteProduct = async (req, res, next) => {
         await product.destroy();
         res.redirect('/admin/products');
     } catch (error) {
-        console.log(error);
+        const error = new Error(error);
+        error.httpStatusCode = 500;
+        return next(error);
     }
 };
 
@@ -154,7 +166,9 @@ exports.getEditProduct = async (req, res, next) => {
             title: 'محصولات'
         });
     } catch (error) {
-        console.log(error);
+        const error = new Error(error);
+        error.httpStatusCode = 500;
+        return next(error);
     }
 };
 
@@ -220,7 +234,9 @@ exports.postEditProduct = async (req, res, next) => {
         await product.save();
         res.redirect('/admin/products');
     } catch (error) {
-        console.log(error);
+        const error = new Error(error);
+        error.httpStatusCode = 500;
+        return next(error);
     }
 };
 
@@ -239,7 +255,9 @@ exports.getCategories = async (req, res, next) => {
             title: 'دسته بندی محصولات'
         });
     } catch (error) {
-        console.log(error);
+        const error = new Error(error);
+        error.httpStatusCode = 500;
+        return next(error);
     }
 };
 
@@ -271,7 +289,9 @@ exports.postDeleteCategory = async (req, res, next) => {
             res.redirect('/admin/categories');
         }
     } catch (error) {
-        console.log(error);
+        const error = new Error(error);
+        error.httpStatusCode = 500;
+        return next(error);
     }
 };
 
@@ -297,7 +317,9 @@ exports.postCategory = async (req, res, next) => {
         await Category.create({ title, description, link });
         res.redirect('/admin/categories');
     } catch (error) {
-        console.log(error);
+        const error = new Error(error);
+        error.httpStatusCode = 500;
+        return next(error);
     }
 };
 
@@ -330,7 +352,9 @@ exports.getEditCategory = async (req, res, next) => {
             category
         });
     } catch (error) {
-        console.log(error);
+        const error = new Error(error);
+        error.httpStatusCode = 500;
+        return next(error);
     }
 };
 
@@ -364,7 +388,9 @@ exports.postEditCategory = async (req, res, next) => {
         await category.save();
         res.redirect('/admin/categories');
     } catch (error) {
-        console.log(error);
+        const error = new Error(error);
+        error.httpStatusCode = 500;
+        return next(error);
     }
 };
 
@@ -379,7 +405,9 @@ exports.getUsers = async (req, res, next) => {
             users
         });
     } catch (error) {
-        console.log(error);
+        const error = new Error(error);
+        error.httpStatusCode = 500;
+        return next(error);
     }
 };
 
@@ -397,7 +425,9 @@ exports.postUpdateUsers = async (req, res, next) => {
 
         res.redirect('/admin/users');
     } catch (error) {
-        console.log(error);
+        const error = new Error(error);
+        error.httpStatusCode = 500;
+        return next(error);
     }
 };
 
@@ -426,7 +456,9 @@ exports.getEditUsers = async (req, res, next) => {
             });
         }
     } catch (error) {
-        console.log(error);
+        const error = new Error(error);
+        error.httpStatusCode = 500;
+        return next(error);
     }
 };
 
@@ -444,7 +476,9 @@ exports.getComments = async (req, res, next) => {
             user: req.user
         });
     } catch (error) {
-        console.log(error);
+        const error = new Error(error);
+        error.httpStatusCode = 500;
+        return next(error);
     }
 };
 
@@ -458,7 +492,9 @@ exports.postCommentStatus = async (req, res, next) => {
 
         res.redirect('/admin/comments');
     } catch (error) {
-        console.log(error);
+        const error = new Error(error);
+        error.httpStatusCode = 500;
+        return next(error);
     }
 };
 
@@ -480,7 +516,9 @@ exports.postDeleteComment = async (req, res, next) => {
             res.redirect('/admin/comments');
         }
     } catch (error) {
-        console.log(error);
+        const error = new Error(error);
+        error.httpStatusCode = 500;
+        return next(error);
     }
 };
 
@@ -501,7 +539,9 @@ exports.getMainPage = async (req, res, next) => {
             editMode
         });
     } catch (error) {
-        console.log(error);
+        const error = new Error(error);
+        error.httpStatusCode = 500;
+        return next(error);
     }
 };
 
@@ -512,6 +552,10 @@ exports.getEditMainPageView = async (req, res, next) => {
 
         const { viewId } = req.query;
         const view = await MainPage.findByPk(viewId);
+
+        if (!view) {
+            flashError(req, res, 'پیدا نشد', '/admin/main-page');
+        }
 
         const editMode = true;
 
@@ -525,7 +569,9 @@ exports.getEditMainPageView = async (req, res, next) => {
             view
         });
     } catch (error) {
-        console.log(error);
+        const error = new Error(error);
+        error.httpStatusCode = 500;
+        return next(error);
     }
 };
 
@@ -533,11 +579,14 @@ exports.postEditMainPageView = async (req, res, next) => {
     try {
         const { title, link, typeId, viewId } = req.body;
 
-
-
         let image = req.file;
         // find product
         let view = await MainPage.findByPk(viewId);
+
+        if (!view) {
+            flashError(req, res, 'پیدا نشد', '/admin/main-page');
+        }
+
         //  if new image --- delete old image
         if (image) {
             deleteFile(view.image);
@@ -547,12 +596,14 @@ exports.postEditMainPageView = async (req, res, next) => {
 
         view.title = title;
         view.link = link;
-        view.mainPageTypeId = typeId
+        view.mainPageTypeId = typeId;
 
         await view.save();
         res.redirect('/admin/main-page');
     } catch (error) {
-        console.log(error);
+        const error = new Error(error);
+        error.httpStatusCode = 500;
+        return next(error);
     }
 };
 
@@ -579,7 +630,9 @@ exports.postAddMainPageView = async (req, res, next) => {
 
         res.redirect('/admin/main-page');
     } catch (error) {
-        console.log(error);
+        const error = new Error(error);
+        error.httpStatusCode = 500;
+        return next(error);
     }
 };
 
@@ -587,6 +640,10 @@ exports.postDeleteMainPageView = async (req, res, next) => {
     try {
         const { viewId } = req.body;
         const mainPage = await MainPage.findByPk(viewId);
+
+        if (!mainPage) {
+            flashError(req, res, 'پیدا نشد', '/admin/main-page');
+        }
         // delete image from storage
         if (mainPage.image) {
             deleteFile(mainPage.image);
@@ -596,11 +653,11 @@ exports.postDeleteMainPageView = async (req, res, next) => {
 
         res.redirect('/admin/main-page');
     } catch (error) {
-        console.log(error);
+        const error = new Error(error);
+        error.httpStatusCode = 500;
+        return next(error);
     }
 };
-
-// exports
 
 exports.postAddMainPageType = async (req, res, next) => {
     try {
@@ -613,7 +670,9 @@ exports.postAddMainPageType = async (req, res, next) => {
 
         res.redirect('/admin/main-page');
     } catch (error) {
-        console.log(error);
+        const error = new Error(error);
+        error.httpStatusCode = 500;
+        return next(error);
     }
 };
 
@@ -622,10 +681,16 @@ exports.postDeleteMainPageType = async (req, res, next) => {
         const { typeId } = req.body;
         const type = await MainPageType.findByPk(typeId);
 
+        if (!type) {
+            flashError(req, res, 'پیدا نشد', '/admin/main-page');
+        }
+
         await type.destroy();
 
         res.redirect('/admin/main-page');
     } catch (error) {
-        console.log(error);
+        const error = new Error(error);
+        error.httpStatusCode = 500;
+        return next(error);
     }
 };

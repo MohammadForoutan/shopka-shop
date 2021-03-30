@@ -57,7 +57,9 @@ exports.getIndex = async (req, res, next) => {
             path: '/'
         });
     } catch (error) {
-        console.log(error);
+        const error = new Error(error);
+        error.httpStatusCode = 500;
+        return next(error);
     }
 };
 
@@ -84,7 +86,9 @@ exports.postSearch = async (req, res, next) => {
             categories
         });
     } catch (error) {
-        console.log(error);
+        const error = new Error(error);
+        error.httpStatusCode = 500;
+        return next(error);
     }
 };
 
@@ -133,7 +137,9 @@ exports.getShop = async (req, res, next) => {
             page
         });
     } catch (error) {
-        console.log(error);
+        const error = new Error(error);
+        error.httpStatusCode = 500;
+        return next(error);
     }
 };
 
@@ -167,7 +173,9 @@ exports.getProduct = async (req, res, next) => {
             commentEditMode: false
         });
     } catch (error) {
-        console.log(error);
+        const error = new Error(error);
+        error.httpStatusCode = 500;
+        return next(error);
     }
 };
 
@@ -191,7 +199,9 @@ exports.postAddComment = async (req, res, next) => {
         });
         res.redirect('/product/' + productId);
     } catch (error) {
-        console.log(error);
+        const error = new Error(error);
+        error.httpStatusCode = 500;
+        return next(error);
     }
 };
 
@@ -226,7 +236,9 @@ exports.postGetEditComment = async (req, res, next) => {
             commentEditMode: true
         });
     } catch (error) {
-        console.log(error);
+        const error = new Error(error);
+        error.httpStatusCode = 500;
+        return next(error);
     }
 };
 
@@ -252,7 +264,9 @@ exports.postPostEditComment = async (req, res, next) => {
         await comment.save();
         res.redirect(`/product/${productId}`);
     } catch (error) {
-        console.log(err);
+        const error = new Error(error);
+        error.httpStatusCode = 500;
+        return next(error);
     }
 };
 
@@ -266,7 +280,9 @@ exports.getProfile = async (req, res, next) => {
             title: 'پروفایل کاربر'
         });
     } catch (error) {
-        console.log(error);
+        const error = new Error(error);
+        error.httpStatusCode = 500;
+        return next(error);
     }
 };
 
@@ -287,7 +303,9 @@ exports.postGetEditProfile = async (req, res, next) => {
             title: 'پروفایل کاربر'
         });
     } catch (error) {
-        console.log(error);
+        const error = new Error(error);
+        error.httpStatusCode = 500;
+        return next(error);
     }
 };
 
@@ -317,7 +335,9 @@ exports.postPostEditProfile = async (req, res, next) => {
 
         res.redirect('/profile');
     } catch (error) {
-        console.log(error);
+        const error = new Error(error);
+        error.httpStatusCode = 500;
+        return next(error);
     }
 };
 
@@ -336,7 +356,9 @@ exports.postProfileAvatar = async (req, res, next) => {
 
         res.redirect('/profile');
     } catch (error) {
-        console.log(error);
+        const error = new Error(error);
+        error.httpStatusCode = 500;
+        return next(error);
     }
 };
 
@@ -353,32 +375,40 @@ exports.getCart = async (req, res, next) => {
             });
         }
     } catch (error) {
-        console.log(error);
+        const error = new Error(error);
+        error.httpStatusCode = 500;
+        return next(error);
     }
 };
 
 exports.postCart = async (req, res, next) => {
-    const { productId } = req.body;
-    let newQuantity = 1;
-    let product;
-    const cart = await req.user.getCart();
-    const products = await cart.getProducts({ where: { id: productId } });
+    try {
+        const { productId } = req.body;
+        let newQuantity = 1;
+        let product;
+        const cart = await req.user.getCart();
+        const products = await cart.getProducts({ where: { id: productId } });
 
-    if (products.length > 0) {
-        product = products[0];
-    }
-    // if product exist in cart
-    if (product) {
-        const oldQuantity = product.cartItem.quantity;
-        newQuantity = oldQuantity + 1;
-    }
-    // if product does not exists (NEW PRODUCT)
-    if (!product) {
-        product = await Product.findByPk(productId);
-    }
-    await cart.addProduct(product, { through: { quantity: newQuantity } });
+        if (products.length > 0) {
+            product = products[0];
+        }
+        // if product exist in cart
+        if (product) {
+            const oldQuantity = product.cartItem.quantity;
+            newQuantity = oldQuantity + 1;
+        }
+        // if product does not exists (NEW PRODUCT)
+        if (!product) {
+            product = await Product.findByPk(productId);
+        }
+        await cart.addProduct(product, { through: { quantity: newQuantity } });
 
-    res.redirect('/cart');
+        res.redirect('/cart');
+    } catch (error) {
+        const error = new Error(error);
+        error.httpStatusCode = 500;
+        return next(error);
+    }
 };
 
 exports.postDeleteCart = async (req, res, next) => {
@@ -390,7 +420,9 @@ exports.postDeleteCart = async (req, res, next) => {
         await product.cartItem.destroy();
         res.redirect('/cart');
     } catch (error) {
-        console.log(error);
+        const error = new Error(error);
+        error.httpStatusCode = 500;
+        return next(error);
     }
 };
 
@@ -408,7 +440,9 @@ exports.getOrder = async (req, res, next) => {
             });
         }
     } catch (error) {
-        console.log(error);
+        const error = new Error(error);
+        error.httpStatusCode = 500;
+        return next(error);
     }
 };
 
@@ -438,7 +472,9 @@ exports.postOrder = async (req, res, next) => {
 
         res.redirect('/order');
     } catch (error) {
-        console.log(error);
+        const error = new Error(error);
+        error.httpStatusCode = 500;
+        return next(error);
     }
 };
 
@@ -450,9 +486,6 @@ exports.getInvoice = async (req, res, next) => {
             include: Product
         });
         const order = orders[0];
-        // res.json({order})
-
-        console.log(order);
 
         if (!order) {
             flashError(req, res, 'سفارش نادرست است', '/order');
@@ -501,6 +534,8 @@ exports.getInvoice = async (req, res, next) => {
         // end pdf
         pdfDoc.end();
     } catch (error) {
-        console.log(error);
+        const error = new Error(error);
+        error.httpStatusCode = 500;
+        return next(error);
     }
 };

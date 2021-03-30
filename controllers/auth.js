@@ -23,7 +23,9 @@ exports.getLogin = async (req, res, next) => {
             title: 'ورود به حساب'
         });
     } catch (error) {
-        console.log(error);
+        const error = new Error(error);
+        error.httpStatusCode = 500;
+        return next(error);
     }
 };
 
@@ -82,19 +84,32 @@ exports.postLogin = async (req, res, next) => {
             });
         }
     } catch (error) {
-        console.log(error);
+        const error = new Error(error);
+        error.httpStatusCode = 500;
+        return next(error);
     }
 };
 
 exports.getSignup = async (req, res, next) => {
-    res.status(200).render('auth/signup', {
-        path: '/auth/signup',
-        user: req.user,
-        errorMessages: req.flash('errorMessages'),
-        oldInput: { name: '', email: '', password: '', confirmPassword: '' },
-        errors: [],
-        title: 'ساخت حساب'
-    });
+    try {
+        res.status(200).render('auth/signup', {
+            path: '/auth/signup',
+            user: req.user,
+            errorMessages: req.flash('errorMessages'),
+            oldInput: {
+                name: '',
+                email: '',
+                password: '',
+                confirmPassword: ''
+            },
+            errors: [],
+            title: 'ساخت حساب'
+        });
+    } catch (error) {
+        const error = new Error(error);
+        error.httpStatusCode = 500;
+        return next(error);
+    }
 };
 
 exports.postSignup = async (req, res, next) => {
@@ -150,7 +165,9 @@ exports.postSignup = async (req, res, next) => {
         const cart = await user.createCart();
         res.redirect('/auth/login');
     } catch (error) {
-        console.log(error);
+        const error = new Error(error);
+        error.httpStatusCode = 500;
+        return next(error);
     }
 };
 
@@ -163,7 +180,9 @@ exports.getResetPassword = async (req, res, next) => {
             title: 'فراموشی رمز'
         });
     } catch (error) {
-        console.log(error);
+        const error = new Error(error);
+        error.httpStatusCode = 500;
+        return next(error);
     }
 };
 
@@ -173,14 +192,14 @@ exports.postResetPassword = async (req, res, next) => {
         const user = await User.findOne({ where: { email: email } });
         // NOT Found user
         if (!user) {
-            flashError(req, res,'کاربری با این ایمیل یافت نشد', '/auth/reset')
+            flashError(req, res, 'کاربری با این ایمیل یافت نشد', '/auth/reset');
         }
         // crypto
         crypto.randomBytes(32, async (err, buffer) => {
             if (err) {
                 // log error
                 console.log(err);
-                flashError(req, res, 'دوباره تلاش کنید.','/auth/reset')
+                flashError(req, res, 'دوباره تلاش کنید.', '/auth/reset');
             }
             // generate token
             const token = buffer.toString('hex');
@@ -189,10 +208,12 @@ exports.postResetPassword = async (req, res, next) => {
             user.resetTokenExpiration = Date.now() + 3600000; // 2 hour lifeTime
             await user.save();
 
-            flashError(req, res, 'ایمیل ارسال شد.', '/auth/reset')
+            flashError(req, res, 'ایمیل ارسال شد.', '/auth/reset');
         }); // end crypto
     } catch (error) {
-        console.log(error);
+        const error = new Error(error);
+        error.httpStatusCode = 500;
+        return next(error);
     }
 };
 
@@ -203,7 +224,7 @@ exports.getNewPassword = async (req, res, next) => {
         const user = await User.findOne({ where: { resetToken: resetToken } });
         // if user not found
         if (!user) {
-            flashError(req,res,'کاربری با این توکن یافت نشد','/auth/login')
+            flashError(req, res, 'کاربری با این توکن یافت نشد', '/auth/login');
         }
 
         res.render('auth/new-password', {
@@ -212,7 +233,9 @@ exports.getNewPassword = async (req, res, next) => {
             title: 'رمز جدید'
         });
     } catch (error) {
-        console.log(error);
+        const error = new Error(error);
+        error.httpStatusCode = 500;
+        return next(error);
     }
 };
 
@@ -233,13 +256,21 @@ exports.postNewPassword = async (req, res, next) => {
 
         res.redirect('/auth/login');
     } catch (error) {
-        console.log(error);
+        const error = new Error(error);
+        error.httpStatusCode = 500;
+        return next(error);
     }
 };
 
 exports.postLogout = async (req, res, next) => {
-    req.session.destroy((error) => {
-        console.log(error);
-        res.redirect('/');
-    });
+    try {
+        req.session.destroy((error) => {
+            console.log(error);
+            res.redirect('/');
+        });
+    } catch (error) {
+        const error = new Error(error);
+        error.httpStatusCode = 500;
+        return next(error);
+    }
 };

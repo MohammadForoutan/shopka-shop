@@ -96,7 +96,7 @@ router.post('/comments/delete', adminController.postDeleteComment);
 router.post('/comment/status', adminController.postCommentStatus);
 
 // GET => /admin/main-page
-router.get('/main-page', adminController.getMainPage)
+router.get('/main-page', adminController.getMainPage);
 
 // POST => /admin/main-page
 router.post('/main-page', adminController.postAddMainPageView);
@@ -105,15 +105,15 @@ router.post('/main-page', adminController.postAddMainPageView);
 router.post('/main-page/delete', adminController.postDeleteMainPageView);
 
 // GET => /admin/main-page/edit?viewId=view.id
-router.get('/main-page/edit', adminController.getEditMainPageView)
+router.get('/main-page/edit', adminController.getEditMainPageView);
 
 // POST => /admin/main-page/edit
-router.post('/main-page/edit', adminController.postEditMainPageView)
+router.post('/main-page/edit', adminController.postEditMainPageView);
 
 // POST => /admin/main-page-type
-router.post('/main-page-type', adminController.postAddMainPageType)
+router.post('/main-page-type', adminController.postAddMainPageType);
 
 // POST => /admin/main-page-type/delete
-router.post('/main-page-type/delete', adminController.postDeleteMainPageType)
+router.post('/main-page-type/delete', adminController.postDeleteMainPageType);
 
 module.exports = router;
