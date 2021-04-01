@@ -75,7 +75,10 @@ app.use(
         resave: false,
         saveUninitialized: false,
         secret: '12345',
-        store: store
+        store: store,
+        cookie: {
+            maxAge: 100 * 60 * 60 * 2,
+        }
     })
 );
 store.sync();
