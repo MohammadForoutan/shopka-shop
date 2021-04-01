@@ -31,6 +31,12 @@ exports.getLogin = async (req, res, next) => {
 
 exports.postLogin = async (req, res, next) => {
     try {
+
+        // if user logged in
+        if(req.user) {
+            flashError(req, res, 'You are already logged in', '/');
+        }
+
         const { email, password } = req.body;
 
         // any error
