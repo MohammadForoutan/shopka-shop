@@ -45,8 +45,6 @@ exports.getIndex = async (req, res, next) => {
             include: { model: Product, limit: 8 }
         });
 
-        // return res.json({categories});
-
         res.status(200).render('shop/index', {
             posters,
             sliders,
@@ -105,23 +103,24 @@ exports.getShop = async (req, res, next) => {
         let products;
 
         if (+categoryId !== ALL_ID) {
-            productsDetail = await Product.count({ where: { categoryId } });
-            productsCount = productsDetail;
-            products = await Product.findAll({
-                where: { categoryId },
-                offset,
-                limit: LIMIT_PER_PAGE
-            });
+            results = await Product.findAndCountAll(
+                { where: { categoryId },
+                 offset,
+                 limit: LIMIT_PER_PAGE
+                }
+            );
+            productsCount = results.count;
+            products = results.rows;
         } else {
-            productsDetail = await Product.findAndCountAll();
-            productsCount = productsDetail.count;
-            products = products = await Product.findAll({
-                offset,
-                limit: LIMIT_PER_PAGE
-            });
+            results = await Product.findAndCountAll(
+                {
+                    offset,
+                    limit: LIMIT_PER_PAGE
+                }
+            );
+            productsCount = results.count;
+            products = results.rows;
         }
-
-        // return res.json({products})
 
         let pages = Math.ceil(productsCount / LIMIT_PER_PAGE); // all pages
 
