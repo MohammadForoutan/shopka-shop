@@ -1,4 +1,5 @@
 const path = require('path');
+const dotenv = require('dotenv').config();
 const express = require('express');
 const session = require('express-session');
 const SequelizeStore = require('connect-session-sequelize')(session.Store);
@@ -23,6 +24,9 @@ const Order = require('./models/order');
 const CommentStatus = require('./models/comment_status');
 const MainPage = require('./models/main-page');
 const MainPageType = require('./models/main-page-type');
+
+// Env variable
+const PORT = process.env.PORT || 3000;
 
 // Routes-path
 const authRoute = require('./routes/auth');
@@ -124,11 +128,11 @@ app.use('/auth', authRoute);
 app.use(errorController.get404);
 
 app.use((error, req, res, next) => {
-    console.log(error)
+    console.log(error);
     res.status(500).render('errors/500', {
         title: 'صفحه پیدا نشد.',
         path: '/500'
-    })
+    });
 });
 // DATABASE‌ ASSOCIATION
 
@@ -168,13 +172,14 @@ db
     // .sync({force: true})
     .sync()
     .then(() => {
-        app.listen(3000, () => {
+        app.listen(PORT, () => {
             console.log(
                 '####################################\n    =======> CONNECTED <========\n####################################'
             );
         });
-    }).catch(error => {
+    })
+    .catch((error) => {
         const err = new Error(error);
         err.httpStatusCode = 500;
         return next(err);
-    })
+    });
