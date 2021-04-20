@@ -4,11 +4,11 @@ const router = express.Router();
 
 const adminController = require('../controllers/admin');
 
-const isAdmin = require('../middleware/is-admin');
 const isAuth = require('../middleware/is-auth');
+const isAdmin = require('../middleware/is-admin');
 
-router.use('/', isAuth);
 router.use('/', isAdmin);
+router.use('/', isAuth);
 
 // GET => /admin
 router.get('/', adminController.getAdmin);
