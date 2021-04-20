@@ -18,6 +18,9 @@
     <%- include('../includes/admin-navigation')%>
     <%- include('../includes/navigation')%>
     <%- include('../includes/menu')%>
+
+    <span class="m-1"></span>
+
     <div class="row mx-0">
         <div class="col-4"> 
             <% for(let poster of posters) { %>
@@ -75,11 +78,12 @@
         </div>
 
         <!-- banner -->
+        <span class="m-1"></span>
         <div class="col-12 row mx-0 mb-3">
 
             <% for(let banner of banners) { %>
                 <div class="col-3">
-                    <img class="img-cover" src="<%= banner.image%>" alt="<%= banner.title %>">
+                    <img class="img-cover rounded" src="<%= banner.image%>" alt="<%= banner.title %>">
                 </div>
             <% } %>
         </div>
@@ -88,11 +92,11 @@
         <!-- categories -->
         <% for(let category of categories) { %>
             <% if(category.link == "all") continue %>
-            <span class="alert text-white bg-success shadow" style="max-width: 250px;"> <%= category.title %></span>
+            <div class="col-12"><span class="text-white bg-success shadow alert d-block" style="width: 250px;"><%= category.title %></span></div>
             <div class="col-12 row mx-0 my-2">
                 <% for (let product of category.products) { %>%>
                     <div class="card col-2 border-0 rounded-0 small">
-                        <img src="/<%= product.image  %>" class="card-img-top img-cover" alt="<%= product.title %>">
+                        <img style="width: 100%;" src="/<%= product.image  %>" class="card-img-top img-cover" alt="<%= product.title %>">
                         <div class="card-body">
                           <h6 class="card-title small"> <%= product.title %></h6>
                           <h6 class="small p-0 py-0"> <%= product.price %> تومان</h6>

@@ -7,8 +7,8 @@ const adminController = require('../controllers/admin');
 const isAuth = require('../middleware/is-auth');
 const isAdmin = require('../middleware/is-admin');
 
-router.use('/', isAdmin);
 router.use('/', isAuth);
+router.use('/', isAdmin);
 
 // GET => /admin
 router.get('/', adminController.getAdmin);

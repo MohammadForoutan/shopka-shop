@@ -1,6 +1,6 @@
 const isAdmin = (req) => {
     // not loggedIn
-    if(!req.user) {
+    if(!req || !req.user) {
         return false;
     }
     if(req.user.accessLevelId == 2) {
