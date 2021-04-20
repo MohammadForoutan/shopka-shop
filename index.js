@@ -114,11 +114,7 @@ app.use(async (req, res, next) => {
 app.use((req, res, next) => {
     res.locals.isLoggedIn = req.session.isLoggedIn;
     res.locals.csrfToken = req.csrfToken();
-
-    console.log(isAdmin(req));
-
     res.locals.isAdmin = isAdmin(req);
-    res.locals.staticImage = 'http://localhost:3000/';
     res.locals.user = req.user;
     next();
 });

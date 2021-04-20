@@ -9,7 +9,7 @@
     <div class="container">
         <div class="row p-5">
             <div class="col-6">
-                <img class="w-50"  src="http://localhost:3000/<%= product.image %>" alt="<%= product.title %>">
+                <img class="w-50"  src="/<%= product.image %>" alt="<%= product.title %>">
                 <% if(isAdmin) { %>
                     <a href="/admin/product/edit?id=<%=product.id%>" class="btn btn-info">ویرایش محصول</a>
                 <% } %>
@@ -76,7 +76,7 @@
                     <% for(let comment of comments) { %>
                         <div style="width: 300px;" class="p-2 m-3 rounded border border-4">
                             <div class="d-flex align-items-center">
-                                <img class="me-2 rounded-pill" style="width: 3rem;" src="<%= staticImage %><%= comment.user.avatar %>" alt="<%= comment.user.name %>">
+                                <img class="me-2 rounded-pill" style="width: 3rem;" src="/<%= comment.user.avatar %>" alt="<%= comment.user.name %>">
                                 <p><%= comment.user.name || comment.email %></p>
                             </div>
                             <hr>

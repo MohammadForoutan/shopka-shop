@@ -51,11 +51,11 @@
                     <!-- avatar -->
                     <% if(user) {%>
                         <a href="/profile" class="nav-item me-2">
-                            <img class="rounded-pill" style="width: 2.5rem; height: 2.5rem;" src="<%= staticImage %><%= user.avatar %>">
+                            <img class="rounded-pill" style="width: 2.5rem; height: 2.5rem;" src="/<%= user.avatar %>">
                         </a>
                     <% } else {%>
                         <a href="/profile" class="nav-item me-2">
-                            <img class="rounded-pill" style="width: 3rem;" src="<%= staticImage %>images/user-avatar.jpg">
+                            <img class="rounded-pill" style="width: 3rem;" src="/images/user-avatar.jpg">
                         </a>
                     <% } %>
                 </ul>

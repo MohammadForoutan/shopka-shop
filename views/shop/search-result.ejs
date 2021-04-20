@@ -34,7 +34,7 @@
             <!-- $$$$$$ PRODUCTS $$$$$  -->
             <%for(let product of results){ %>
                 <div class="card col-4 m-4 rounded-0"> <!-- border-end-0 -->
-                    <img src="<%= staticImage %><%= product.image  %>" class="card-img-top" alt="<%= product.title %>">
+                    <img src="/<%= product.image  %>" class="card-img-top" alt="<%= product.title %>">
                     <div class="card-body">
                       <h6 class="card-title small"> <%= product.title %></h6>
                       <h6 class="small bg-warning py-1 btn"> <%= product.price %> تومان</h6>
