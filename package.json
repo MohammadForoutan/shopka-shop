@@ -4,7 +4,8 @@
   "description": "simple shop with mysql",
   "main": "index.js",
   "scripts": {
-    "start": "nodemon index.js"
+    "start": "node index.js",
+    "dev-start": "nodemon index.js"
   },
   "author": "MmdFr1",
   "license": "ISC",
