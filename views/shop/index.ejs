@@ -46,7 +46,7 @@
                     <% for(let slider of sliders) {  %>
                             <div class="carousel-item <%= slider_index == 0 ? 'active': ''%>">
                                 <a href="<%= slider.link %>">
-                                    <img height="600" src="<%= slider.image %>" class="d-block w-100 img-cover" alt="<%= slider.title %>" title="<%= slider.title %>">
+                                    <img src="<%= slider.image %>" class="d-block w-100 img-cover" alt="<%= slider.title %>" title="<%= slider.title %>">
                                 </a>
                             </div>
                         <% slider_index++ %>
