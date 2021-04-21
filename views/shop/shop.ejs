@@ -30,10 +30,10 @@
     <div class="row mx-0 px-0">
         <!-- sidebar  -->
 
-        <div class="col-12 mx-0 row p-0 justify-content-center">
+        <div class="col-12 mx-0 row p-0 pt-3 justify-content-center">
             <!-- $$$$$$ PRODUCTS $$$$$  -->
             <%for(let product of products){ %>
-                <div class="card col-4 m-4 rounded-0"> <!-- border-end-0 -->
+                <div class="card col-md-6 col-sm-12 rounded-0 border-0"> <!-- border-end-0 -->
                     <img src="/<%= product.image  %>" class="card-img-top" alt="<%= product.title %>">
                     <div class="card-body">
                       <h6 class="card-title small"> <%= product.title %></h6>

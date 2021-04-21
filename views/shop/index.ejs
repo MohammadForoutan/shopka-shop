@@ -22,16 +22,9 @@
     <span class="m-1"></span>
 
     <div class="row mx-0">
-        <div class="col-4"> 
-            <% for(let poster of posters) { %>
-                <a href="<%= poster.link %>" class="d-block mb-2">
-                    <img class="img-cover" src="<%= poster.image %>" alt="<%= poster.title %>">
-                </a>
-            <% } %>
-        </div>
-    
+        
         <!-- sliders -->
-        <div class="col-8">
+        <div class="col-md-8 col-sm-12">
             <!-- slider -->
             <div id="mainSlider" class="carousel slide" data-bs-ride="carousel" >
                 <div class="carousel-indicators">
@@ -76,6 +69,14 @@
                 </div>
             </div>
         </div>
+        <!-- posters -->
+        <div class="col-md-4 col-sm-12 row mx-0 px-2 pt-1"> 
+            <% for(let poster of posters) { %>
+                <a href="<%= poster.link %>" class="col-md-12 col-sm-6 mb-2 mx-0 px-1">
+                    <img class="img-cover" src="<%= poster.image %>" alt="<%= poster.title %>">
+                </a>
+            <% } %>
+        </div>
 
         <!-- banner -->
         <span class="m-1"></span>
@@ -95,7 +96,7 @@
             <div class="col-12"><span class="text-white bg-success shadow alert d-block" style="width: 250px;"><%= category.title %></span></div>
             <div class="col-12 row mx-0 my-2">
                 <% for (let product of category.products) { %>%>
-                    <div class="card col-2 border-0 rounded-0 small">
+                    <div class="card col-md-2 col-sm-4 border-0 rounded-0 small">
                         <img style="width: 100%;" src="/<%= product.image  %>" class="card-img-top img-cover" alt="<%= product.title %>">
                         <div class="card-body">
                           <h6 class="card-title small"> <%= product.title %></h6>

@@ -45,8 +45,10 @@
             </div>
         </nav>
         <div class="tab-content" id="nav-tabContent">
-            <div class="tab-pane fade show active w-75" id="nav-attributes" role="tabpanel" aria-labelledby="nav-attributes-tab">
-                <%- product.attributes %>
+            <div class="tab-pane fade show active w-100" id="nav-attributes" role="tabpanel" aria-labelledby="nav-attributes-tab">
+                <div class="table-attributes">
+                    <%- product.attributes %>
+                </div>
             </div>
             <div class="tab-pane fade text-right" id="nav-comment" role="tabpanel" aria-labelledby="nav-comment-tab">
                 <h4 class="text-right pt-4 py-2">دیدگاه‌ها</h4>
@@ -124,7 +126,7 @@
                     <div class="card-body">
                         <h6 class="card-title small"> <%= relatedProduct.title %></h6>
                         <h6 class="small p-0 py-0"> <%= relatedProduct.price %> تومان</h6>
-                        <a href="/relatedProduct/<%= relatedProduct.id %>" class="btn btn-primary btn-sm">بررسی</a>
+                        <a href="/product/<%= relatedProduct.id %>" class="btn btn-primary btn-sm">بررسی</a>
                     </div>
                 </div>
             <% } %>

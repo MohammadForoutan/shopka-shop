@@ -1,12 +1,20 @@
 <footer class="text-white text-center py-3 bg-dark mt-5">
-    shokpa shop
+    <div class="row mx-0">
+        <div class="col-6">
+            <h3 class="pt-3">منو</h3>
+            <hr>
+            <ul class="text-white list-unstyled">
+                <li class="nav-item"> <a class="nav-link <%= path === '/' ? 'active' : '' %>"  href="/">خانه</a></li>
+                <li class="nav-item"> <a class="nav-link <%= path === '/shop' ? 'active' : '' %>" href="/shop">فروشگاه</a></li>
+                <li class="nav-item"> <a class="nav-link <%= path === '/cart' ? 'active' : '' %>" href="/cart">سبدخرید</a></li>
+                <li class="nav-item"> <a class="nav-link <%= path === '/order' ? 'active' : '' %>" href="/order">سفارش</a></li>
+                <li class="nav-item"> <a class="nav-link <%= path === '/profile' ? 'active' : '' %>" href="/profile">پروفایل</a></li>
+            </ul>
+        </div>
+    </div>
 </footer>
-<!-- <script src="/js/popper.js"></script> -->
-<!-- <script src="/js/bootstrap.bundle.min"></script> -->
-<!-- <script src="/js/jquery-3.5.1.slim.min.js"></script> -->
+
 <script src="/js/bootstrap.min.js"></script>
-
-
 
 </body>
 
