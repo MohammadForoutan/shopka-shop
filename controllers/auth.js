@@ -159,7 +159,13 @@ exports.postSignup = async (req, res, next) => {
             });
         }
 
-        const hashedPassword = await bcrypt.hash(password, 12);
+        const salt;
+        bcrypt.genSalt(12, (err, createdSalt) => {
+            if (err) throw "please try again"
+            salt = createdSalt;
+        })
+        
+        const hashedPassword = await bcrypt.hash(password, salt);
         const user = await User.create({
             name,
             email,
