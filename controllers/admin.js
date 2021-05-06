@@ -9,7 +9,7 @@ const MainPageType = require('../models/main-page-type');
 // util
 const { validationResult } = require('express-validator');
 const { deleteFile } = require('../util/file');
-const { flashError } = require('../util/error');
+const { flashError, expressErrHandler } = require('../util/error');
 
 const ALL_CATEGORY_ID = 1;
 const UNCATEGORIZED_CATEGORY_ID = 2;
@@ -22,9 +22,7 @@ exports.getAdmin = (req, res, next) => {
             title: 'داشبورد'
         });
     } catch (error) {
-        const err = new Error(error);
-        err.httpStatusCode = 500;
-        return next(err);
+       expressErrHandler(error, next)
     }
 };
 
@@ -54,10 +52,7 @@ exports.getProducts = async (req, res, next) => {
             categories
         });
     } catch (error) {
-        const err = new Error(error);
-        err.httpStatusCode = 500;
-        return next(err);
-    }
+        expressErrHandler(error, next)    }
 };
 
 exports.postAddProduct = async (req, res, next) => {
@@ -74,7 +69,8 @@ exports.postAddProduct = async (req, res, next) => {
             description,
             link,
             categoryId,
-            attributes
+            attributes,
+            completeDecription
         } = req.body;
 
         // express validator
@@ -96,7 +92,8 @@ exports.postAddProduct = async (req, res, next) => {
                     description,
                     link,
                     categoryId,
-                    attributes
+                    attributes,
+                    completeDecription
                 },
                 products,
                 categories
@@ -110,13 +107,12 @@ exports.postAddProduct = async (req, res, next) => {
             categoryId,
             link,
             image: image.path,
-            attributes
+            attributes,
+            completeDecription
         });
         res.redirect('/admin/products');
     } catch (error) {
-        const err = new Error(error);
-        err.httpStatusCode = 500;
-        return next(err);
+        expressErrHandler(error, next)
     }
 };
 
@@ -130,9 +126,7 @@ exports.postDeleteProduct = async (req, res, next) => {
         await product.destroy();
         res.redirect('/admin/products');
     } catch (error) {
-        const err = new Error(error);
-        err.httpStatusCode = 500;
-        return next(err);
+        expressErrHandler(error, next)
     }
 };
 
@@ -160,15 +154,14 @@ exports.getEditProduct = async (req, res, next) => {
                 description: '',
                 link: '',
                 categoryId: '',
-                attributes: ''
+                attributes: '',
+                completeDecription: ''
             },
             errors: [],
             title: 'محصولات'
         });
     } catch (error) {
-        const err = new Error(error);
-        err.httpStatusCode = 500;
-        return next(err);
+        expressErrHandler(error, next)
     }
 };
 
@@ -181,7 +174,8 @@ exports.postEditProduct = async (req, res, next) => {
             description,
             categoryId,
             productId,
-            attributes
+            attributes,
+            completeDecription
         } = req.body;
 
         // express validator
@@ -210,7 +204,8 @@ exports.postEditProduct = async (req, res, next) => {
                     description,
                     link,
                     categoryId,
-                    attributes
+                    attributes,
+                    completeDecription
                 },
                 errors: errors.array(),
                 title: 'محصولات'
@@ -231,12 +226,11 @@ exports.postEditProduct = async (req, res, next) => {
         product.description = description;
         product.categoryId = categoryId;
         product.attributes = attributes;
+        product.completeDecription = completeDecription;
         await product.save();
         res.redirect('/admin/products');
     } catch (error) {
-        const err = new Error(error);
-        err.httpStatusCode = 500;
-        return next(err);
+        expressErrHandler(error, next)
     }
 };
 
@@ -255,9 +249,7 @@ exports.getCategories = async (req, res, next) => {
             title: 'دسته بندی محصولات'
         });
     } catch (error) {
-        const err = new Error(error);
-        err.httpStatusCode = 500;
-        return next(err);
+        expressErrHandler(error, next)
     }
 };
 
@@ -289,9 +281,7 @@ exports.postDeleteCategory = async (req, res, next) => {
             res.redirect('/admin/categories');
         }
     } catch (error) {
-        const err = new Error(error);
-        err.httpStatusCode = 500;
-        return next(err);
+        expressErrHandler(error, next)
     }
 };
 
@@ -317,9 +307,7 @@ exports.postCategory = async (req, res, next) => {
         await Category.create({ title, description, link });
         res.redirect('/admin/categories');
     } catch (error) {
-        const err = new Error(error);
-        err.httpStatusCode = 500;
-        return next(err);
+        expressErrHandler(error, next)
     }
 };
 
@@ -352,9 +340,7 @@ exports.getEditCategory = async (req, res, next) => {
             category
         });
     } catch (error) {
-        const err = new Error(error);
-        err.httpStatusCode = 500;
-        return next(err);
+        expressErrHandler(error, next)
     }
 };
 
@@ -388,9 +374,7 @@ exports.postEditCategory = async (req, res, next) => {
         await category.save();
         res.redirect('/admin/categories');
     } catch (error) {
-        const err = new Error(error);
-        err.httpStatusCode = 500;
-        return next(err);
+        expressErrHandler(error, next)
     }
 };
 
@@ -405,9 +389,7 @@ exports.getUsers = async (req, res, next) => {
             users
         });
     } catch (error) {
-        const err = new Error(error);
-        err.httpStatusCode = 500;
-        return next(err);
+        expressErrHandler(error, next)
     }
 };
 
@@ -425,9 +407,7 @@ exports.postUpdateUsers = async (req, res, next) => {
 
         res.redirect('/admin/users');
     } catch (error) {
-        const err = new Error(error);
-        err.httpStatusCode = 500;
-        return next(err);
+        expressErrHandler(error, next)
     }
 };
 
@@ -456,9 +436,7 @@ exports.getEditUsers = async (req, res, next) => {
             });
         }
     } catch (error) {
-        const err = new Error(error);
-        err.httpStatusCode = 500;
-        return next(err);
+        expressErrHandler(error, next)
     }
 };
 
@@ -476,9 +454,7 @@ exports.getComments = async (req, res, next) => {
             user: req.user
         });
     } catch (error) {
-        const err = new Error(error);
-        err.httpStatusCode = 500;
-        return next(err);
+        expressErrHandler(error, next)
     }
 };
 
@@ -492,9 +468,7 @@ exports.postCommentStatus = async (req, res, next) => {
 
         res.redirect('/admin/comments');
     } catch (error) {
-        const err = new Error(error);
-        err.httpStatusCode = 500;
-        return next(err);
+        expressErrHandler(error, next)
     }
 };
 
@@ -516,9 +490,7 @@ exports.postDeleteComment = async (req, res, next) => {
             res.redirect('/admin/comments');
         }
     } catch (error) {
-        const err = new Error(error);
-        err.httpStatusCode = 500;
-        return next(err);
+        expressErrHandler(error, next)
     }
 };
 
@@ -539,9 +511,7 @@ exports.getMainPage = async (req, res, next) => {
             editMode
         });
     } catch (error) {
-        const err = new Error(error);
-        err.httpStatusCode = 500;
-        return next(err);
+        expressErrHandler(error, next)
     }
 };
 
@@ -569,9 +539,7 @@ exports.getEditMainPageView = async (req, res, next) => {
             view
         });
     } catch (error) {
-        const err = new Error(error);
-        err.httpStatusCode = 500;
-        return next(err);
+        expressErrHandler(error, next)
     }
 };
 
@@ -601,9 +569,7 @@ exports.postEditMainPageView = async (req, res, next) => {
         await view.save();
         res.redirect('/admin/main-page');
     } catch (error) {
-        const err = new Error(error);
-        err.httpStatusCode = 500;
-        return next(err);
+        expressErrHandler(error, next)
     }
 };
 
@@ -630,9 +596,7 @@ exports.postAddMainPageView = async (req, res, next) => {
 
         res.redirect('/admin/main-page');
     } catch (error) {
-        const err = new Error(error);
-        err.httpStatusCode = 500;
-        return next(err);
+        expressErrHandler(error, next)
     }
 };
 
@@ -653,9 +617,7 @@ exports.postDeleteMainPageView = async (req, res, next) => {
 
         res.redirect('/admin/main-page');
     } catch (error) {
-        const err = new Error(error);
-        err.httpStatusCode = 500;
-        return next(err);
+        expressErrHandler(error, next)
     }
 };
 
@@ -670,9 +632,7 @@ exports.postAddMainPageType = async (req, res, next) => {
 
         res.redirect('/admin/main-page');
     } catch (error) {
-        const err = new Error(error);
-        err.httpStatusCode = 500;
-        return next(err);
+        expressErrHandler(error, next)
     }
 };
 
@@ -689,8 +649,6 @@ exports.postDeleteMainPageType = async (req, res, next) => {
 
         res.redirect('/admin/main-page');
     } catch (error) {
-        const err = new Error(error);
-        err.httpStatusCode = 500;
-        return next(err);
+        expressErrHandler(error, next)
     }
 };

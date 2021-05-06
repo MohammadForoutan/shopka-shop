@@ -129,6 +129,16 @@
 									</textarea>
 									
 								</div>
+
+								<div class="col-12">
+									<label for="completeDecription">توضیحات تکمیلی</label>
+									
+									<!-- textarea  -->
+									<textarea cols="80" id="completeDecription" name="completeDecription" rows="10">
+										<%= oldInput.completeDecription ? oldInput.completeDecription :  editMode ? product.completeDecription : ''%>
+									</textarea>
+									
+								</div>
 							</div>
 							<!-- csrfToken -->
 							<input type="hidden" name="_csrf" value="<%= csrfToken %>">

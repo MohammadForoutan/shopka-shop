@@ -20,6 +20,9 @@ const Category = db.define('category', {
     },
     description: {
         type: DataTypes.STRING
+    },
+    image: {
+        type: DataTypes.STRING
     }
 });
 

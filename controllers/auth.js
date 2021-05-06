@@ -5,7 +5,7 @@ const User = require('../models/user');
 
 const MEMEBER_ACCESSLEVEL_ID = 1;
 
-const { flashError } = require('../util/error');
+const { flashError, expressErrHandler } = require('../util/error');
 
 exports.getLogin = async (req, res, next) => {
     try {
@@ -23,9 +23,7 @@ exports.getLogin = async (req, res, next) => {
             title: 'ورود به حساب'
         });
     } catch (error) {
-        const err = new Error(error);
-        err.httpStatusCode = 500;
-        return next(err);
+        expressErrHandler(error, next)
     }
 };
 
@@ -90,9 +88,7 @@ exports.postLogin = async (req, res, next) => {
             });
         }
     } catch (error) {
-        const err = new Error(error);
-        err.httpStatusCode = 500;
-        return next(err);
+        expressErrHandler(error, next)
     }
 };
 
@@ -112,9 +108,7 @@ exports.getSignup = async (req, res, next) => {
             title: 'ساخت حساب'
         });
     } catch (error) {
-        const err = new Error(error);
-        err.httpStatusCode = 500;
-        return next(err);
+        expressErrHandler(error, next)
     }
 };
 
@@ -159,12 +153,7 @@ exports.postSignup = async (req, res, next) => {
             });
         }
 
-        const salt;
-        bcrypt.genSalt(12, (err, createdSalt) => {
-            if (err) throw "please try again"
-            salt = createdSalt;
-        })
-        
+        const salt = await bcrypt.genSalt(12);
         const hashedPassword = await bcrypt.hash(password, salt);
         const user = await User.create({
             name,
@@ -177,9 +166,7 @@ exports.postSignup = async (req, res, next) => {
         const cart = await user.createCart();
         res.redirect('/auth/login');
     } catch (error) {
-        const err = new Error(error);
-        err.httpStatusCode = 500;
-        return next(err);
+        expressErrHandler(error, next)
     }
 };
 
@@ -192,9 +179,7 @@ exports.getResetPassword = async (req, res, next) => {
             title: 'فراموشی رمز'
         });
     } catch (error) {
-        const err = new Error(error);
-        err.httpStatusCode = 500;
-        return next(err);
+        expressErrHandler(error, next)
     }
 };
 
@@ -223,9 +208,7 @@ exports.postResetPassword = async (req, res, next) => {
             flashError(req, res, 'ایمیل ارسال شد.', '/auth/reset');
         }); // end crypto
     } catch (error) {
-        const err = new Error(error);
-        err.httpStatusCode = 500;
-        return next(err);
+        expressErrHandler(error, next)
     }
 };
 
@@ -245,9 +228,7 @@ exports.getNewPassword = async (req, res, next) => {
             title: 'رمز جدید'
         });
     } catch (error) {
-        const err = new Error(error);
-        err.httpStatusCode = 500;
-        return next(err);
+        expressErrHandler(error, next)
     }
 };
 
@@ -268,9 +249,7 @@ exports.postNewPassword = async (req, res, next) => {
 
         res.redirect('/auth/login');
     } catch (error) {
-        const err = new Error(error);
-        err.httpStatusCode = 500;
-        return next(err);
+        expressErrHandler(error, next)
     }
 };
 
@@ -281,8 +260,6 @@ exports.postLogout = async (req, res, next) => {
             res.redirect('/');
         });
     } catch (error) {
-        const err = new Error(error);
-        err.httpStatusCode = 500;
-        return next(err);
+        expressErrHandler(error, next)
     }
 };

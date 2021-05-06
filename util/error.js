@@ -7,6 +7,13 @@ const flashError = (request, result, message, redirectAddress) => {
     });
 };
 
+const expressErrHandler = (error , next) => {
+    const err = new Error(error);
+        err.httpStatusCode = 500;
+        return next(err);
+}
+
 module.exports = {
-    flashError
+    flashError,
+    expressErrHandler
 };

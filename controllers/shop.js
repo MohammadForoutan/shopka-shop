@@ -9,7 +9,7 @@ const { Op } = require('sequelize');
 const bcrypt = require('bcryptjs');
 const PDFDocument = require('pdfkit');
 const { deleteFile } = require('../util/file');
-const { flashError } = require('../util/error');
+const { flashError, expressErrHandler } = require('../util/error');
 
 const LIMIT_PER_PAGE = 2; // limit per page product in shop-page
 const ALL_ID = 2; // all_id_category
@@ -42,7 +42,7 @@ exports.getIndex = async (req, res, next) => {
 
         const categories = await Category.findAll({
             limit: 4,
-            include: { model: Product, limit: 8 }
+            include: { model: Product, limit: 6 }
         });
 
         res.status(200).render('shop/index', {
@@ -55,9 +55,7 @@ exports.getIndex = async (req, res, next) => {
             path: '/'
         });
     } catch (error) {
-        const err = new Error(error);
-        err.httpStatusCode = 500;
-        return next(err);
+        expressErrHandler(error, next);
     }
 };
 
@@ -68,6 +66,9 @@ exports.postSearch = async (req, res, next) => {
         const results = await Product.findAll({
             where: {
                 title: {
+                    [Op.like]: `%${search}%`
+                },
+                description: {
                     [Op.like]: `%${search}%`
                 }
             },
@@ -84,16 +85,29 @@ exports.postSearch = async (req, res, next) => {
             categories
         });
     } catch (error) {
-        const err = new Error(error);
-        err.httpStatusCode = 500;
-        return next(err);
+        expressErrHandler(error, next);
     }
 };
 
 exports.getShop = async (req, res, next) => {
     try {
         // take data from query
-        let { page, categoryId } = req.query;
+        console.log(req.query);
+        let { page, categoryId, sort, toPrice, fromPrice } = req.query;
+        let sortValue;
+        let price = {
+            max: toPrice || 9999999999999999,
+            min: fromPrice || 0
+        }
+
+        sort === 'fromLowest' ? sortValue = ['price', 'ASC'] :
+        sort === 'fromHighest' ? sortValue = ['price', 'DESC']:
+        sort === 'fromOldest' ? sortValue = ['createdAt', 'ASC']:
+        sortValue = ['createdAt', 'DESC']
+
+
+        
+
         categoryId = categoryId || ALL_ID;
         page = page || 1;
         const offset = LIMIT_PER_PAGE * (page - 1);
@@ -102,20 +116,30 @@ exports.getShop = async (req, res, next) => {
         let productsCount;
         let products;
 
-        if (+categoryId !== ALL_ID) {
+        if (categoryId != ALL_ID) {
             results = await Product.findAndCountAll(
-                { where: { categoryId },
+                { where: { categoryId: categoryId, price: {[Op.gte]: price.min, [Op.lte]: price.max} },
                  offset,
-                 limit: LIMIT_PER_PAGE
+                 order: [
+                     sortValue
+                    ],
+                    limit: LIMIT_PER_PAGE,
+
                 }
             );
             productsCount = results.count;
             products = results.rows;
         } else {
             results = await Product.findAndCountAll(
-                {
-                    offset,
-                    limit: LIMIT_PER_PAGE
+                {where: {price: { [Op.gte]: price.min,
+                                  [Op.lte]: price.max
+                                }
+                        },
+                        offset,
+                    order: [
+                        sortValue
+                    ],
+                    limit: LIMIT_PER_PAGE,
                 }
             );
             productsCount = results.count;
@@ -133,12 +157,11 @@ exports.getShop = async (req, res, next) => {
             categories,
             title: 'فروشگاه',
             pages,
-            page
+            page,
+            sort
         });
     } catch (error) {
-        const err = new Error(error);
-        err.httpStatusCode = 500;
-        return next(err);
+        expressErrHandler(error, next);
     }
 };
 
@@ -172,9 +195,7 @@ exports.getProduct = async (req, res, next) => {
             commentEditMode: false
         });
     } catch (error) {
-        const err = new Error(error);
-        err.httpStatusCode = 500;
-        return next(err);
+        expressErrHandler(error, next);
     }
 };
 
@@ -198,9 +219,7 @@ exports.postAddComment = async (req, res, next) => {
         });
         res.redirect('/product/' + productId);
     } catch (error) {
-        const err = new Error(error);
-        err.httpStatusCode = 500;
-        return next(err);
+        expressErrHandler(error, next);
     }
 };
 
@@ -235,9 +254,7 @@ exports.postGetEditComment = async (req, res, next) => {
             commentEditMode: true
         });
     } catch (error) {
-        const err = new Error(error);
-        err.httpStatusCode = 500;
-        return next(err);
+        expressErrHandler(error, next);
     }
 };
 
@@ -263,9 +280,7 @@ exports.postPostEditComment = async (req, res, next) => {
         await comment.save();
         res.redirect(`/product/${productId}`);
     } catch (error) {
-        const err = new Error(error);
-        err.httpStatusCode = 500;
-        return next(err);
+        expressErrHandler(error, next);
     }
 };
 
@@ -279,9 +294,7 @@ exports.getProfile = async (req, res, next) => {
             title: 'پروفایل کاربر'
         });
     } catch (error) {
-        const err = new Error(error);
-        err.httpStatusCode = 500;
-        return next(err);
+        expressErrHandler(error, next);
     }
 };
 
@@ -302,9 +315,7 @@ exports.postGetEditProfile = async (req, res, next) => {
             title: 'پروفایل کاربر'
         });
     } catch (error) {
-        const err = new Error(error);
-        err.httpStatusCode = 500;
-        return next(err);
+        expressErrHandler(error, next);
     }
 };
 
@@ -334,9 +345,7 @@ exports.postPostEditProfile = async (req, res, next) => {
 
         res.redirect('/profile');
     } catch (error) {
-        const err = new Error(error);
-        err.httpStatusCode = 500;
-        return next(err);
+        expressErrHandler(error, next);
     }
 };
 
@@ -355,9 +364,7 @@ exports.postProfileAvatar = async (req, res, next) => {
 
         res.redirect('/profile');
     } catch (error) {
-        const err = new Error(error);
-        err.httpStatusCode = 500;
-        return next(err);
+        expressErrHandler(error, next);
     }
 };
 
@@ -374,9 +381,7 @@ exports.getCart = async (req, res, next) => {
             });
         }
     } catch (error) {
-        const err = new Error(error);
-        err.httpStatusCode = 500;
-        return next(err);
+        expressErrHandler(error, next);
     }
 };
 
@@ -404,9 +409,7 @@ exports.postCart = async (req, res, next) => {
 
         res.redirect('/cart');
     } catch (error) {
-        const err = new Error(error);
-        err.httpStatusCode = 500;
-        return next(err);
+        expressErrHandler(error, next);
     }
 };
 
@@ -419,9 +422,7 @@ exports.postDeleteCart = async (req, res, next) => {
         await product.cartItem.destroy();
         res.redirect('/cart');
     } catch (error) {
-        const err = new Error(error);
-        err.httpStatusCode = 500;
-        return next(err);
+        expressErrHandler(error, next);
     }
 };
 
@@ -439,9 +440,7 @@ exports.getOrder = async (req, res, next) => {
             });
         }
     } catch (error) {
-        const err = new Error(error);
-        err.httpStatusCode = 500;
-        return next(err);
+        expressErrHandler(error, next);
     }
 };
 
@@ -471,9 +470,7 @@ exports.postOrder = async (req, res, next) => {
 
         res.redirect('/order');
     } catch (error) {
-        const err = new Error(error);
-        err.httpStatusCode = 500;
-        return next(err);
+        expressErrHandler(error, next);
     }
 };
 
@@ -533,8 +530,6 @@ exports.getInvoice = async (req, res, next) => {
         // end pdf
         pdfDoc.end();
     } catch (error) {
-        const err = new Error(error);
-        err.httpStatusCode = 500;
-        return next(err);
+        expressErrHandler(error, next);
     }
 };
