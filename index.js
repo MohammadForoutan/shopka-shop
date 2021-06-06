@@ -129,7 +129,7 @@ app.use(errorController.get404);
 app.use((error, req, res, next) => {
     console.log(error);
     res.status(500).render('errors/500', {
-        title: 'صفحه پیدا نشد.',
+        title: 'مشکلی در سیستم رخ داده است.',
         path: '/500'
     });
 });
