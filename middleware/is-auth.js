@@ -3,6 +3,7 @@ const { flashError } = require('../util/error');
 module.exports = (req, res, next) => {
     const user = req.user;
     // if user not found = user not log in
+    console.log(user)
     if (!user) {
         return flashError(
             req,
@@ -11,6 +12,5 @@ module.exports = (req, res, next) => {
             '/auth/login'
         );
     }
-    res.redirect('/auth/login')
     next();
 };

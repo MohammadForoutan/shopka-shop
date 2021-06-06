@@ -81,7 +81,7 @@ app.use(
         secret: '12345',
         store: store,
         cookie: {
-            maxAge: 100 * 60 * 60 * 2
+            maxAge: 100 * 60 * 60 * 1000
         }
     })
 );
